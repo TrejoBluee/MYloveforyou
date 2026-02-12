@@ -1,214 +1,226 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Nuestro Lugar 💗</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nuestro Lugar 💗</title>
 
-<style>
-body{
-margin:0;
-font-family:Arial;
-background:#ffd6ec;
-overflow:hidden;
-text-align:center;
-color:#fff;
-}
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #ffd6ec;
+            overflow: hidden;
+            text-align: center;
+            color: #d81b60; /* Color más oscuro para mejor lectura */
+        }
 
-.screen{
-position:absolute;
-width:100%;
-height:100%;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-transition:1s;
-}
+        .screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: 1s;
+        }
 
-.hidden{
-opacity:0;
-pointer-events:none;
-}
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.9);
+        }
 
-input{
-padding:10px;
-border-radius:20px;
-border:none;
-text-align:center;
-}
+        input {
+            padding: 12px;
+            border-radius: 20px;
+            border: 2px solid #ff69b4;
+            text-align: center;
+            outline: none;
+            font-size: 16px;
+        }
 
-button{
-padding:10px 20px;
-border:none;
-border-radius:20px;
-background:#ff69b4;
-color:white;
-cursor:pointer;
-margin-top:10px;
-}
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 20px;
+            background: #ff69b4;
+            color: white;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
+            transition: 0.3s;
+        }
 
-.heart{
-position:absolute;
-color:#ff4da6;
-font-size:30px;
-animation:float 10s linear infinite;
-}
+        button:hover {
+            background: #ff1493;
+            transform: translateY(-2px);
+        }
 
-@keyframes float{
-0%{transform:translateY(100vh);opacity:0;}
-50%{opacity:1;}
-100%{transform:translateY(-10vh);opacity:0;}
-}
+        .heart {
+            position: absolute;
+            color: #ff4da6;
+            font-size: 30px;
+            user-select: none;
+            animation: float 10s linear infinite;
+            z-index: -1;
+        }
 
-#contador{
-font-size:22px;
-margin:20px;
-}
+        @keyframes float {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            20% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        }
 
-#musicBtn{
-position:fixed;
-bottom:20px;
-right:20px;
-background:#ff1493;
-}
+        #contador {
+            font-size: 24px;
+            margin: 20px;
+            background: rgba(255, 255, 255, 0.4);
+            padding: 20px;
+            border-radius: 15px;
+            line-height: 1.6;
+        }
 
-/* 🔥 VERSION */
-#version{
-position:fixed;
-bottom:10px;
-left:15px;
-font-size:14px;
-opacity:0.7;
-}
-</style>
+        #musicBtn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ff1493;
+            z-index: 100;
+        }
+
+        #version {
+            position: fixed;
+            bottom: 10px;
+            left: 15px;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
+        h1, h2 {
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+    </style>
 </head>
-
 <body>
 
-<div id="lock" class="screen">
-<h1>Bienvenida a nuestro lugar 💗</h1>
-<input type="password" id="password" placeholder="Contraseña">
-<button onclick="unlock()">Desbloquear</button>
-</div>
+    <div id="lock" class="screen">
+        <h1>Bienvenida a nuestro lugar 💗</h1>
+        <input type="password" id="password" placeholder="Nuestra contraseña">
+        <button onclick="unlock()">Desbloquear</button>
+    </div>
 
-<div id="main" class="screen hidden">
-<h2>Tiempo juntos 💕</h2>
-<div id="contador"></div>
-</div>
+    <div id="main" class="screen hidden">
+        <h2>Tiempo juntos 💕</h2>
+        <div id="contador">Cargando nuestro tiempo...</div>
+    </div>
 
-<button id="musicBtn" onclick="startMusic()">Activar música 🎵</button>
+    <button id="musicBtn" onclick="toggleMusic()">Activar música 🎵</button>
 
-<!-- 🔥 VERSION DISPLAY -->
-<div id="version">v2</div>
+    <div id="version">v2.1</div>
 
-<!-- REPRODUCTOR -->
-<div id="player"></div>
+    <div id="player"></div>
 
-<script src="https://www.youtube.com/iframe_api"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
 
-<script>
+    <script>
+        /* ========= CONFIGURACIÓN ========= */
+        const youtubeLinks = ["https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"];
+        const PASSWORD = "MarioAndYoss4EVER";
+        const startDate = new Date("2026-01-23T00:00:00");
+        /* ================================= */
 
-/* ========= 🎵 PEGA TUS LINKS DE YOUTUBE AQUÍ ========= */
+        let currentSong = 0;
+        let player;
+        let playerReady = false;
+        let isPlaying = false;
 
-const youtubeLinks = [
-  "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"
-];
+        // Cargar API de YouTube
+        function onYouTubeIframeAPIReady() {
+            player = new YT.Player('player', {
+                height: '0',
+                width: '0',
+                playerVars: { 'autoplay': 0, 'controls': 0 },
+                events: {
+                    'onReady': () => { playerReady = true; },
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
 
-/* ================================================ */
+        function getVideoID(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = url.match(regExp);
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
 
-const PASSWORD = "MarioAndYoss4EVER";
-let currentSong = 0;
-let player;
-let playerReady = false;
+        function toggleMusic() {
+            if (!playerReady) return;
+            
+            if (!isPlaying) {
+                player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
+                document.getElementById("musicBtn").innerText = "Pausar música ⏸️";
+                isPlaying = true;
+            } else {
+                player.pauseVideo();
+                document.getElementById("musicBtn").innerText = "Reanudar música 🎵";
+                isPlaying = false;
+            }
+        }
 
-function onYouTubeIframeAPIReady() {
-player = new YT.Player('player', {
-height: '0',
-width: '0',
-playerVars: {
-'controls': 0
-},
-events: {
-'onReady': function() {
-playerReady = true;
-},
-'onStateChange': onPlayerStateChange
-}
-});
-}
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.ENDED) {
+                currentSong = (currentSong + 1) % youtubeLinks.length;
+                player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
+            }
+        }
 
-function getVideoID(url){
-let regExp = /v=([^&]+)/;
-let match = url.match(regExp);
-return match ? match[1] : null;
-}
+        function unlock() {
+            const passInput = document.getElementById("password").value;
+            if (passInput === PASSWORD) {
+                document.getElementById("lock").classList.add("hidden");
+                document.getElementById("main").classList.remove("hidden");
+            } else {
+                alert("Contraseña incorrecta 💔");
+            }
+        }
 
-function startMusic(){
-if(!playerReady) return;
+        // Lógica de Corazones
+        function createHeart() {
+            let heart = document.createElement("div");
+            heart.className = "heart";
+            heart.innerHTML = "💗";
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = (20 + Math.random() * 40) + "px";
+            heart.style.animationDuration = (5 + Math.random() * 7) + "s";
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 10000);
+        }
+        setInterval(createHeart, 500);
 
-player.loadVideoById({
-videoId: getVideoID(youtubeLinks[currentSong]),
-startSeconds: 0
-});
-}
+        // Lógica del Contador
+        function updateCounter() {
+            let now = new Date();
+            let diff = now - startDate;
 
-function onPlayerStateChange(event){
-if(event.data === YT.PlayerState.ENDED){
-currentSong++;
-if(currentSong >= youtubeLinks.length){
-currentSong = 0;
-}
+            if (diff < 0) {
+                document.getElementById("contador").innerHTML = "Nuestro tiempo comienza pronto 💕";
+                return;
+            }
 
-player.loadVideoById({
-videoId: getVideoID(youtubeLinks[currentSong]),
-startSeconds: 0
-});
-}
-}
+            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            let minutes = Math.floor((diff / (1000 * 60)) % 60);
+            let seconds = Math.floor((diff / 1000) % 60);
 
-function unlock(){
-if(document.getElementById("password").value === PASSWORD){
-document.getElementById("lock").classList.add("hidden");
-document.getElementById("main").classList.remove("hidden");
-}
-}
-
-function createHeart(){
-let heart = document.createElement("div");
-heart.className="heart";
-heart.innerHTML="💗";
-heart.style.left=Math.random()*100+"vw";
-heart.style.fontSize=(20+Math.random()*40)+"px";
-heart.style.animationDuration=(5+Math.random()*5)+"s";
-document.body.appendChild(heart);
-setTimeout(()=>heart.remove(),10000);
-}
-
-setInterval(createHeart,500);
-
-const startDate = new Date("2026-01-23T00:00:00");
-
-function updateCounter(){
-let now = new Date();
-let diff = now - startDate;
-
-if(diff < 0){
-document.getElementById("contador").innerHTML="Nuestro tiempo comienza pronto 💕";
-return;
-}
-
-let hours = Math.floor(diff / (1000*60*60));
-let minutes = Math.floor((diff / (1000*60)) % 60);
-let seconds = Math.floor((diff / 1000) % 60);
-
-document.getElementById("contador").innerHTML =
-hours + " horas 💕 " + minutes + " minutos 💗 " + seconds + " segundos";
-}
-
-setInterval(updateCounter,1000);
-
-</script>
-
+            document.getElementById("contador").innerHTML = 
+                `<strong>${days}</strong> días<br>` +
+                `${hours} horas, ${minutes} minutos<br>y ${seconds} segundos juntos 💗`;
+        }
+        setInterval(updateCounter, 1000);
+    </script>
 </body>
 </html>
 
