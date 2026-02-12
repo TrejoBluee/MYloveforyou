@@ -7,224 +7,171 @@
 <style>
 body{
 margin:0;
-font-family:Arial, sans-serif;
+font-family:Arial;
 background:#ffd6ec;
 overflow:hidden;
-color:white;
 text-align:center;
+color:#fff;
 }
 
-/* LOCK SCREEN */
-#lockScreen{
-position:fixed;
+.screen{
+position:absolute;
 width:100%;
-height:100vh;
-background:#ffc0e6;
+height:100%;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
-transition:1s ease;
-z-index:10;
+transition:1s;
 }
 
-#lockScreen.hidden{
-transform:translateY(-100%);
+.hidden{
 opacity:0;
+pointer-events:none;
 }
 
 input{
 padding:10px;
 border-radius:20px;
 border:none;
-margin-top:10px;
 text-align:center;
-width:230px;
 }
 
 button{
 padding:10px 20px;
 border:none;
 border-radius:20px;
-margin-top:10px;
-cursor:pointer;
 background:#ff69b4;
 color:white;
-font-size:15px;
+cursor:pointer;
+margin-top:10px;
 }
 
-#mainContent{
-padding:30px;
-display:none;
-}
-
-/* Corazones */
 .heart{
 position:absolute;
-color:#ff4fa3;
-animation:float 8s linear infinite;
-pointer-events:none;
+color:#ff4da6;
+font-size:30px;
+animation:float 10s linear infinite;
 }
 
 @keyframes float{
-0%{transform:translateY(100vh);opacity:1;}
+0%{transform:translateY(100vh);opacity:0;}
+50%{opacity:1;}
 100%{transform:translateY(-10vh);opacity:0;}
 }
 
-.message{
-background:rgba(255,255,255,0.2);
-margin:10px auto;
-padding:10px;
-border-radius:20px;
-width:80%;
-}
-
 #contador{
-font-size:20px;
-margin:15px 0;
+font-size:22px;
+margin:20px;
 }
 
-#musicButton{
-margin-top:15px;
-background:#ff4fa3;
+#musicBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#ff1493;
 }
 </style>
 </head>
 
 <body>
 
-<div id="lockScreen">
-<h2>Bienvenida a nuestro lugar ❤️</h2>
+<div id="lock" class="screen">
+<h1>Bienvenida a nuestro lugar 💗</h1>
 <input type="password" id="password" placeholder="Contraseña">
-<button onclick="unlock()">Entrar</button>
+<button onclick="unlock()">Desbloquear</button>
 </div>
 
-<div id="mainContent">
-<h1>Nuestro Tiempo Juntos 💞</h1>
-<h2 id="contador"></h2>
-
-<button id="musicButton" onclick="iniciarMusica()">
-Activar música 💕
-</button>
-
-<hr>
-
-<h2>Mensajes Bonitos 💌</h2>
-<input type="text" id="mensajeInput" placeholder="Escribe algo lindo...">
-<button onclick="enviarMensaje()">Enviar</button>
-<div id="mensajes"></div>
+<div id="main" class="screen hidden">
+<h2>Tiempo juntos 💕</h2>
+<div id="contador"></div>
 </div>
 
-<div id="player" style="display:none;"></div>
-<script src="https://www.youtube.com/iframe_api"></script>
+<button id="musicBtn" onclick="startMusic()">Activar música 🎵</button>
 
-<script type="module">
+<iframe id="player" allow="autoplay" style="display:none"></iframe>
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script>
 
-/* FIREBASE */
-const firebaseConfig = {
-  apiKey: "AIzaSyDZbYnONzq_fXZ696MEI8rYkNHHs0yNNy4",
-  authDomain: "nuestro-lugar.firebaseapp.com",
-  projectId: "nuestro-lugar",
-  storageBucket: "nuestro-lugar.firebasestorage.app",
-  messagingSenderId: "1001590537058",
-  appId: "1:1001590537058:web:1096b422db717d43320a3b"
-};
+/* ========= 🎵 PEGA TUS LINKS DE YOUTUBE AQUÍ ========= */
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const youtubeLinks = [
+  "https://www.youtube.com/watch?v=xV9mqKWBqaw&list=RDxV9mqKWBqaw&start_radio=1",
+  "https://www.youtube.com/watch?v=8kL5Sb40mgg&list=RD8kL5Sb40mgg&start_radio=1",
+  "https://www.youtube.com/watch?v=Mcj75l2gJcY&list=RDMcj75l2gJcY&start_radio=1",
+  "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1",
+  "https://www.youtube.com/watch?v=8Pi_jWZNgEU&list=RD8Pi_jWZNgEU&start_radio=1"
+];
 
-/* 🔐 CONTRASEÑA */
-window.unlock = function(){
-if(document.getElementById("password").value==="MarioAndYoss4EVER"){
-document.getElementById("lockScreen").classList.add("hidden");
-setTimeout(()=>{
-document.getElementById("mainContent").style.display="block";
-},1000);
+/* ================================================ */
+
+const PASSWORD = "MarioAndYoss4EVER";
+let currentSong = 0;
+let player = document.getElementById("player");
+
+function getVideoID(url){
+let regExp = /v=([^&]+)/;
+let match = url.match(regExp);
+return match ? match[1] : null;
+}
+
+function startMusic(){
+if(youtubeLinks.length === 0) return;
+
+let id = getVideoID(youtubeLinks[currentSong]);
+if(!id) return;
+
+player.src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=0&enablejsapi=1`;
+}
+
+function unlock(){
+if(document.getElementById("password").value === PASSWORD){
+document.getElementById("lock").classList.add("hidden");
+document.getElementById("main").classList.remove("hidden");
 }
 }
 
-/* 💗 CORAZONES */
-setInterval(()=>{
-let heart=document.createElement("div");
+function createHeart(){
+let heart = document.createElement("div");
 heart.className="heart";
 heart.innerHTML="💗";
 heart.style.left=Math.random()*100+"vw";
-heart.style.fontSize=(30+Math.random()*50)+"px";
+heart.style.fontSize=(20+Math.random()*40)+"px";
+heart.style.animationDuration=(5+Math.random()*5)+"s";
 document.body.appendChild(heart);
-setTimeout(()=>heart.remove(),8000);
-},400);
-
-/* ⏳ CONTADOR TIEMPO REAL */
-function actualizarContador(){
-let inicio=new Date("2026-01-23T00:00:00");
-let ahora=new Date();
-let diff=ahora-inicio;
-
-let dias=Math.floor(diff/(1000*60*60*24));
-let horas=Math.floor((diff/(1000*60*60))%24);
-let minutos=Math.floor((diff/(1000*60))%60);
-let segundos=Math.floor((diff/1000)%60);
-
-document.getElementById("contador").innerText =
-dias+" días "+horas+"h "+minutos+"m "+segundos+"s 💕";
-}
-setInterval(actualizarContador,1000);
-
-/* 💌 MENSAJES */
-window.enviarMensaje=async function(){
-let texto=document.getElementById("mensajeInput").value;
-if(texto==="")return;
-await addDoc(collection(db,"mensajes"),{
-texto:texto,
-fecha:new Date()
-});
-document.getElementById("mensajeInput").value="";
+setTimeout(()=>heart.remove(),10000);
 }
 
-const q = query(collection(db,"mensajes"), orderBy("fecha","asc"));
+setInterval(createHeart,500);
 
-onSnapshot(q,(snapshot)=>{
-let cont=document.getElementById("mensajes");
-cont.innerHTML="";
-snapshot.forEach(doc=>{
-cont.innerHTML+=`<div class="message">${doc.data().texto}</div>`;
-});
-});
+/* CONTADOR DESDE 23 ENERO 2026 */
 
-/* 🎵 PLAYLIST */
-let canciones=[
-"xV9mqKWBqaw",
-"8kL5Sb40mgg",
-"R5cbxTPZNL0",
-"Mcj75l2gJcY",
-"dElRVQFqj-k"
-];
+const startDate = new Date("2026-01-23T00:00:00");
 
-let player;
+function updateCounter(){
+let now = new Date();
+let diff = now - startDate;
 
-window.onYouTubeIframeAPIReady=function(){
-player=new YT.Player('player',{
-height:'0',
-width:'0',
-playerVars:{'controls':0}
-});
+if(diff < 0){
+document.getElementById("contador").innerHTML="Nuestro tiempo comienza pronto 💕";
+return;
 }
 
-window.iniciarMusica=function(){
-if(player){
-player.loadPlaylist(canciones);
-player.playVideo();
-document.getElementById("musicButton").innerText="Reproduciendo 💗";
+let hours = Math.floor(diff / (1000*60*60));
+let minutes = Math.floor((diff / (1000*60)) % 60);
+let seconds = Math.floor((diff / 1000) % 60);
+
+document.getElementById("contador").innerHTML =
+hours + " horas 💕 " + minutes + " minutos 💗 " + seconds + " segundos";
 }
-}
+
+setInterval(updateCounter,1000);
 
 </script>
 
 </body>
 </html>
+
 
 
 
