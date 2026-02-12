@@ -71,6 +71,15 @@ bottom:20px;
 right:20px;
 background:#ff1493;
 }
+
+/* 🔥 VERSION */
+#version{
+position:fixed;
+bottom:10px;
+left:15px;
+font-size:14px;
+opacity:0.7;
+}
 </style>
 </head>
 
@@ -89,10 +98,12 @@ background:#ff1493;
 
 <button id="musicBtn" onclick="startMusic()">Activar música 🎵</button>
 
+<!-- 🔥 VERSION DISPLAY -->
+<div id="version">v1</div>
+
 <!-- REPRODUCTOR -->
 <div id="player"></div>
 
-<!-- API OFICIAL -->
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
@@ -100,8 +111,7 @@ background:#ff1493;
 /* ========= 🎵 PEGA TUS LINKS DE YOUTUBE AQUÍ ========= */
 
 const youtubeLinks = [
-  "https://www.youtube.com/watch?v=Z1zYWPBsNjw&list=RDZ1zYWPBsNjw&start_radio=1",
-  "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"
+  "https://www.youtube.com/watch?v=dElRVQFqj-k"
 ];
 
 /* ================================================ */
@@ -110,8 +120,6 @@ const PASSWORD = "MarioAndYoss4EVER";
 let currentSong = 0;
 let player;
 let playerReady = false;
-
-/* ========= API READY ========= */
 
 function onYouTubeIframeAPIReady() {
 player = new YT.Player('player', {
@@ -135,8 +143,6 @@ let match = url.match(regExp);
 return match ? match[1] : null;
 }
 
-/* ========= BOTÓN ========= */
-
 function startMusic(){
 if(!playerReady) return;
 
@@ -145,8 +151,6 @@ videoId: getVideoID(youtubeLinks[currentSong]),
 startSeconds: 0
 });
 }
-
-/* ========= CAMBIO AUTOMÁTICO ========= */
 
 function onPlayerStateChange(event){
 if(event.data === YT.PlayerState.ENDED){
@@ -162,16 +166,12 @@ startSeconds: 0
 }
 }
 
-/* ========= DESBLOQUEO ========= */
-
 function unlock(){
 if(document.getElementById("password").value === PASSWORD){
 document.getElementById("lock").classList.add("hidden");
 document.getElementById("main").classList.remove("hidden");
 }
 }
-
-/* ========= CORAZONES ========= */
 
 function createHeart(){
 let heart = document.createElement("div");
@@ -185,8 +185,6 @@ setTimeout(()=>heart.remove(),10000);
 }
 
 setInterval(createHeart,500);
-
-/* ========= CONTADOR DESDE 23 ENERO 2026 ========= */
 
 const startDate = new Date("2026-01-23T00:00:00");
 
