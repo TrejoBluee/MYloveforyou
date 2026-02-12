@@ -9,7 +9,7 @@ body{
 margin:0;
 font-family:Arial, sans-serif;
 background:#ffd6ec;
-overflow-x:hidden;
+overflow:hidden;
 color:white;
 text-align:center;
 }
@@ -39,7 +39,7 @@ border-radius:20px;
 border:none;
 margin-top:10px;
 text-align:center;
-width:220px;
+width:230px;
 }
 
 button{
@@ -50,6 +50,7 @@ margin-top:10px;
 cursor:pointer;
 background:#ff69b4;
 color:white;
+font-size:15px;
 }
 
 #mainContent{
@@ -62,6 +63,7 @@ display:none;
 position:absolute;
 color:#ff4fa3;
 animation:float 8s linear infinite;
+pointer-events:none;
 }
 
 @keyframes float{
@@ -69,13 +71,22 @@ animation:float 8s linear infinite;
 100%{transform:translateY(-10vh);opacity:0;}
 }
 
-/* Mensajes */
 .message{
 background:rgba(255,255,255,0.2);
 margin:10px auto;
 padding:10px;
 border-radius:20px;
 width:80%;
+}
+
+#contador{
+font-size:20px;
+margin:15px 0;
+}
+
+#musicButton{
+margin-top:15px;
+background:#ff4fa3;
 }
 </style>
 </head>
@@ -92,6 +103,10 @@ width:80%;
 <h1>Nuestro Tiempo Juntos 💞</h1>
 <h2 id="contador"></h2>
 
+<button id="musicButton" onclick="iniciarMusica()">
+Activar música 💕
+</button>
+
 <hr>
 
 <h2>Mensajes Bonitos 💌</h2>
@@ -100,7 +115,6 @@ width:80%;
 <div id="mensajes"></div>
 </div>
 
-<!-- YouTube oculto -->
 <div id="player" style="display:none;"></div>
 <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -109,7 +123,7 @@ width:80%;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-/* 🔥 TU CONFIG YA INTEGRADA */
+/* FIREBASE */
 const firebaseConfig = {
   apiKey: "AIzaSyDZbYnONzq_fXZ696MEI8rYkNHHs0yNNy4",
   authDomain: "nuestro-lugar.firebaseapp.com",
@@ -138,19 +152,24 @@ let heart=document.createElement("div");
 heart.className="heart";
 heart.innerHTML="💗";
 heart.style.left=Math.random()*100+"vw";
-heart.style.fontSize=(20+Math.random()*30)+"px";
+heart.style.fontSize=(30+Math.random()*50)+"px";
 document.body.appendChild(heart);
 setTimeout(()=>heart.remove(),8000);
-},500);
+},400);
 
-/* ⏳ CONTADOR */
+/* ⏳ CONTADOR TIEMPO REAL */
 function actualizarContador(){
 let inicio=new Date("2026-01-23T00:00:00");
 let ahora=new Date();
 let diff=ahora-inicio;
+
 let dias=Math.floor(diff/(1000*60*60*24));
-document.getElementById("contador").innerText=
-dias+" días juntos 💕";
+let horas=Math.floor((diff/(1000*60*60))%24);
+let minutos=Math.floor((diff/(1000*60))%60);
+let segundos=Math.floor((diff/1000)%60);
+
+document.getElementById("contador").innerText =
+dias+" días "+horas+"h "+minutos+"m "+segundos+"s 💕";
 }
 setInterval(actualizarContador,1000);
 
@@ -185,21 +204,28 @@ let canciones=[
 ];
 
 let player;
+
 window.onYouTubeIframeAPIReady=function(){
 player=new YT.Player('player',{
 height:'0',
 width:'0',
-playerVars:{'autoplay':1,'controls':0},
-events:{
-'onReady':function(e){e.target.loadPlaylist(canciones);},
-}
+playerVars:{'controls':0}
 });
+}
+
+window.iniciarMusica=function(){
+if(player){
+player.loadPlaylist(canciones);
+player.playVideo();
+document.getElementById("musicButton").innerText="Reproduciendo 💗";
+}
 }
 
 </script>
 
 </body>
 </html>
+
 
 
 
