@@ -70,8 +70,56 @@
             padding: 20px; 
             border-radius: 15px; 
             line-height: 1.5; 
+            position: relative; /* Para que la galería no lo tape */
+            z-index: 5;
         }
-        /* El reproductor debe existir pero estar oculto */
+
+        /* ESTILOS PARA LA GALERÍA DE FOTOS */
+        .gallery-container {
+            position: relative;
+            width: 90%; /* Ancho responsivo */
+            max-width: 500px; /* Ancho máximo */
+            height: 300px; /* Altura fija */
+            margin: 20px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(255, 105, 180, 0.4);
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .gallery-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Asegura que la imagen cubra el espacio sin distorsionarse */
+            position: absolute;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .gallery-img.active {
+            opacity: 1;
+        }
+        .gallery-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 105, 180, 0.7);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.5em;
+            z-index: 10;
+            transition: background 0.3s;
+        }
+        .gallery-btn:hover {
+            background: rgba(255, 20, 147, 0.9);
+        }
+        #prevBtn { left: 10px; }
+        #nextBtn { right: 10px; }
+
         #player { position: absolute; top: -1000px; }
     </style>
 </head>
@@ -86,6 +134,12 @@
     <div id="main" class="screen hidden">
         <h2>Tiempo juntos 💕</h2>
         <div id="contador">Cargando nuestro tiempo...</div>
+        
+        <div class="gallery-container">
+            <img id="galleryImage" class="gallery-img active" src="" alt="Nuestra foto">
+            <button id="prevBtn" class="gallery-btn" onclick="changePhoto(-1)">&#10094;</button>
+            <button id="nextBtn" class="gallery-btn" onclick="changePhoto(1)">&#10095;</button>
+        </div>
     </div>
 
     <div id="player"></div>
@@ -97,12 +151,22 @@
         const PLAYLIST_ID = "PLVNTLp-dvMDjGQJqvR14FR1FkUNcsFKDV"; 
         const PASSWORD = "MarioAndYoss4EVER";
         const startDate = new Date("2026-01-23T00:00:00");
+
+        // Aquí van los enlaces de tus fotos
+        const photoSources = [
+            "https://i.postimg.cc/FsFZnTJQ/Whats-App-Image-2026-02-12-at-5-25-52-PM-(2).jpg", // Ejemplo
+            "https://i.postimg.cc/j2chS7mM/Whats-App-Image-2026-02-12-at-5-25-52-PM-(1).jpg", // Ejemplo
+            "https://i.postimg.cc/MTk5Pxyw/Whats-App-Image-2026-02-12-at-5-25-52-PM.jpg"  // Ejemplo
+            // Agrega más fotos aquí, separadas por coma
+        ];
         /* ================================= */
 
         let player;
         let apiReady = false;
 
-        // Esta función la llama automáticamente la API de YouTube
+        let currentPhotoIndex = 0;
+        let photoInterval;
+
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '0',
@@ -112,52 +176,59 @@
                     'list': PLAYLIST_ID,
                     'autoplay': 0,
                     'controls': 0,
-                    'disablekb': 1,
-                    'rel': 0
+                    'loop': 1
                 },
                 events: {
-                    'onReady': onPlayerReady,
-                    'onError': (e) => console.log("Error de YouTube:", e)
+                    'onReady': () => { apiReady = true; },
+                    'onError': (e) => {
+                        console.log("Error de YouTube:", e);
+                        player.nextVideo();
+                    }
                 }
-            });
-        }
-
-        function onPlayerReady(event) {
-            apiReady = true;
-            // Pre-cargamos la lista pero sin sonar todavía
-            player.cuePlaylist({
-                list: PLAYLIST_ID,
-                listType: 'playlist',
-                index: 0,
-                startSeconds: 0
             });
         }
 
         function unlock() {
             const input = document.getElementById("password").value;
             if (input === PASSWORD) {
-                // Cambiar de pantalla
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
 
-                // Intentar reproducir música
+                // Iniciar galería de fotos
+                loadPhoto(currentPhotoIndex);
+                startPhotoSlideshow();
+
+                // Iniciar música
                 if (apiReady && player) {
-                    player.playVideo();
-                    // Refuerzo por si cuePlaylist no fue suficiente
-                    setTimeout(() => {
-                        if (player.getPlayerState() !== 1) { // 1 significa 'Reproduciendo'
-                            player.loadPlaylist({
-                                list: PLAYLIST_ID,
-                                listType: 'playlist'
-                            });
-                        }
-                    }, 500);
-                } else {
-                    console.log("API no lista, la música podría tardar...");
+                    player.loadPlaylist({
+                        list: PLAYLIST_ID,
+                        listType: 'playlist',
+                        index: 0
+                    });
+                    player.setVolume(100);
                 }
             } else {
                 alert("Contraseña incorrecta 💔");
             }
+        }
+
+        // LÓGICA DE LA GALERÍA DE FOTOS
+        function loadPhoto(index) {
+            document.getElementById("galleryImage").src = photoSources[index];
+        }
+
+        function changePhoto(n) {
+            clearInterval(photoInterval); // Detener el auto-cambio temporalmente
+            currentPhotoIndex = (currentPhotoIndex + n + photoSources.length) % photoSources.length;
+            loadPhoto(currentPhotoIndex);
+            startPhotoSlideshow(); // Reiniciar el auto-cambio
+        }
+
+        function startPhotoSlideshow() {
+            photoInterval = setInterval(() => {
+                currentPhotoIndex = (currentPhotoIndex + 1) % photoSources.length;
+                loadPhoto(currentPhotoIndex);
+            }, 5000); // Cambia cada 5 segundos
         }
 
         // Generador de corazones
@@ -194,4 +265,3 @@
     </script>
 </body>
 </html>
-
