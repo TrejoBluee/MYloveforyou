@@ -16,7 +16,7 @@ body {
     font-family: 'Segoe UI', sans-serif;
 }
 
-/* Corazones */
+/* Corazones flotando */
 .heart {
     position: absolute;
     color: #ff4d88;
@@ -37,7 +37,10 @@ body {
     box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
-h1 { color:#ff2e75; }
+h1 { 
+    color:#ff2e75; 
+    font-weight:400;
+}
 
 input, button {
     width:100%;
@@ -54,6 +57,10 @@ button {
     cursor:pointer;
 }
 
+button:hover {
+    background:#ff2e75;
+}
+
 #error {
     color:red;
     display:none;
@@ -68,7 +75,7 @@ button {
 
 <div class="lock-container" id="lockScreen">
     <h1>Bienvenida a nuestro lugar ❤️</h1>
-    <input type="password" id="password" placeholder="MarioAndYoss">
+    <input type="password" id="password" placeholder="Ingresa la contraseña">
     <button onclick="checkPassword()">Entrar</button>
     <div id="error">Contraseña incorrecta 💔</div>
 </div>
@@ -78,10 +85,10 @@ button {
 </div>
 
 <script>
-// ====== PEGA AQUÍ TUS 5 LINKS ======
+// ====== PEGA AQUÍ TUS 5 LINKS DE YOUTUBE ======
 const playlist = [
-    "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1",
-    "https://www.youtube.com/watch?v=8kL5Sb40mgg&list=RD8kL5Sb40mgg&start_radio=1",
+    "PEGA_LINK_1_AQUI",
+    "PEGA_LINK_2_AQUI",
     "PEGA_LINK_3_AQUI",
     "PEGA_LINK_4_AQUI",
     "PEGA_LINK_5_AQUI"
@@ -141,9 +148,10 @@ document.addEventListener("click", function() {
     }
 }, { once:true });
 
+// Contraseña fija
 function checkPassword() {
     var password = document.getElementById("password").value;
-    var correctPassword = "amor123";
+    var correctPassword = "MarioAndYoss4EVER";
 
     if (password === correctPassword) {
         document.getElementById("lockScreen").style.display = "none";
