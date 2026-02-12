@@ -2,70 +2,82 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Acceso Privado</title>
+<title>Nuestro Lugar</title>
 
 <style>
 body {
     margin: 0;
     height: 100vh;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    background: #ffd6e8;
+    overflow: hidden;
     display: flex;
     justify-content: center;
     align-items: center;
     font-family: 'Segoe UI', sans-serif;
-    color: white;
+}
+
+/* Corazones animados */
+.heart {
+    position: absolute;
+    color: #ff4d88;
+    font-size: 20px;
+    animation: float 10s linear infinite;
+}
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) scale(1.5);
+        opacity: 0;
+    }
 }
 
 .lock-container {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
     padding: 40px;
-    border-radius: 20px;
+    border-radius: 25px;
     text-align: center;
     width: 320px;
-    box-shadow: 0 0 40px rgba(0,0,0,0.6);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
 }
 
 h1 {
-    margin-bottom: 20px;
-    font-weight: 300;
+    color: #ff2e75;
+    font-weight: 400;
 }
 
 input {
     width: 100%;
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 15px;
     border: none;
-    outline: none;
+    margin-top: 15px;
     margin-bottom: 15px;
-    font-size: 16px;
     text-align: center;
+    font-size: 16px;
 }
 
 button {
     width: 100%;
     padding: 12px;
-    border-radius: 10px;
+    border-radius: 15px;
     border: none;
-    background: #8e2de2;
+    background: #ff4d88;
     color: white;
     font-size: 16px;
     cursor: pointer;
-    transition: 0.3s;
 }
 
 button:hover {
-    background: #4a00e0;
+    background: #ff2e75;
 }
 
 #error {
-    color: #ff4d4d;
-    margin-top: 10px;
-    font-size: 14px;
-    display: none;
-}
-
-#content {
+    color: red;
     display: none;
 }
 </style>
@@ -73,22 +85,41 @@ button:hover {
 </head>
 <body>
 
+<!-- Música YouTube (oculta) -->
+<iframe id="music"
+width="0"
+height="0"
+src="https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"
+frameborder="0"
+allow="autoplay">
+</iframe>
+
 <div class="lock-container" id="lockScreen">
-    <h1>🔒 Acceso Privado</h1>
+    <h1>Bienvenida a nuestro lugar ❤️</h1>
     <input type="password" id="password" placeholder="Ingresa la contraseña">
     <button onclick="checkPassword()">Entrar</button>
-    <div id="error">Contraseña incorrecta</div>
+    <div id="error">Contraseña incorrecta 💔</div>
 </div>
 
-<div id="content">
-    <h1>Bienvenido 😎</h1>
-    <p>Solo las personas correctas pueden estar aquí.</p>
+<div id="content" style="display:none; text-align:center;">
+    <h1 style="color:#ff2e75;">💖 Estás dentro 💖</h1>
 </div>
 
 <script>
+// Generar corazones
+for (let i = 0; i < 30; i++) {
+    let heart = document.createElement("div");
+    heart.className = "heart";
+    heart.innerHTML = "❤";
+    heart.style.left = Math.random() * 100 + "vw";
+    heart.style.animationDuration = (5 + Math.random() * 5) + "s";
+    heart.style.fontSize = (15 + Math.random() * 25) + "px";
+    document.body.appendChild(heart);
+}
+
 function checkPassword() {
     var password = document.getElementById("password").value;
-    var correctPassword = "MarioAndYoss4EVER";  // CAMBIA ESTA CONTRASEÑA
+    var correctPassword = "amor123"; // CAMBIA ESTA CONTRASEÑA
 
     if (password === correctPassword) {
         document.getElementById("lockScreen").style.display = "none";
@@ -101,3 +132,4 @@ function checkPassword() {
 
 </body>
 </html>
+
