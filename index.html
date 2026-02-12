@@ -89,25 +89,29 @@ background:#ff1493;
 
 <button id="musicBtn" onclick="startMusic()">Activar música 🎵</button>
 
-<iframe id="player" allow="autoplay" style="display:none"></iframe>
+<!-- 👇 CAMBIO: ahora es div y no iframe -->
+<div id="player"></div>
+
+<!-- API oficial de YouTube -->
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
 
 /* ========= 🎵 PEGA TUS LINKS DE YOUTUBE AQUÍ ========= */
 
 const youtubeLinks = [
-  "https://www.youtube.com/watch?v=xV9mqKWBqaw&list=RDxV9mqKWBqaw&start_radio=1",
-  "https://www.youtube.com/watch?v=8kL5Sb40mgg&list=RD8kL5Sb40mgg&start_radio=1",
-  "https://www.youtube.com/watch?v=Mcj75l2gJcY&list=RDMcj75l2gJcY&start_radio=1",
-  "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1",
-  "https://www.youtube.com/watch?v=8Pi_jWZNgEU&list=RD8Pi_jWZNgEU&start_radio=1"
+  "https://youtu.be/dElRVQFqj-k?si=Vb2Bb17XKBHsiaOn",
+  "https://www.youtube.com/watch?v=MzNduKt0ylU&list=RDMzNduKt0ylU&start_radio=1",
+  "https://www.youtube.com/watch?v=Z1zYWPBsNjw&list=RDZ1zYWPBsNjw&start_radio=1"
 ];
 
 /* ================================================ */
 
 const PASSWORD = "MarioAndYoss4EVER";
 let currentSong = 0;
-let player = document.getElementById("player");
+let player;
+
+/* ========= MÚSICA EN CADENA AUTOMÁTICA ========= */
 
 function getVideoID(url){
 let regExp = /v=([^&]+)/;
@@ -115,14 +119,38 @@ let match = url.match(regExp);
 return match ? match[1] : null;
 }
 
-function startMusic(){
-if(youtubeLinks.length === 0) return;
-
-let id = getVideoID(youtubeLinks[currentSong]);
-if(!id) return;
-
-player.src = `https://www.youtube.com/embed/${id}?autoplay=1&controls=0&enablejsapi=1`;
+function onYouTubeIframeAPIReady() {
+player = new YT.Player('player', {
+height: '0',
+width: '0',
+videoId: getVideoID(youtubeLinks[currentSong]),
+playerVars: {
+'autoplay': 0,
+'controls': 0
+},
+events: {
+'onStateChange': onPlayerStateChange
 }
+});
+}
+
+function startMusic(){
+if(player){
+player.playVideo();
+}
+}
+
+function onPlayerStateChange(event){
+if(event.data === YT.PlayerState.ENDED){
+currentSong++;
+if(currentSong >= youtubeLinks.length){
+currentSong = 0;
+}
+player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
+}
+}
+
+/* ========= DESBLOQUEO ========= */
 
 function unlock(){
 if(document.getElementById("password").value === PASSWORD){
@@ -130,6 +158,8 @@ document.getElementById("lock").classList.add("hidden");
 document.getElementById("main").classList.remove("hidden");
 }
 }
+
+/* ========= CORAZONES ========= */
 
 function createHeart(){
 let heart = document.createElement("div");
@@ -144,7 +174,7 @@ setTimeout(()=>heart.remove(),10000);
 
 setInterval(createHeart,500);
 
-/* CONTADOR DESDE 23 ENERO 2026 */
+/* ========= CONTADOR DESDE 23 ENERO 2026 ========= */
 
 const startDate = new Date("2026-01-23T00:00:00");
 
