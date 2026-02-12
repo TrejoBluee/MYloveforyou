@@ -2,167 +2,204 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Nuestro Lugar</title>
+<title>Nuestro Lugar 💗</title>
 
 <style>
-body {
-    margin: 0;
-    height: 100vh;
-    background: #ffd6e8;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: 'Segoe UI', sans-serif;
+body{
+margin:0;
+font-family:Arial, sans-serif;
+background:#ffd6ec;
+overflow-x:hidden;
+color:white;
+text-align:center;
 }
 
-/* Corazones flotando */
-.heart {
-    position: absolute;
-    color: #ff4d88;
-    animation: float 8s linear infinite;
+/* LOCK SCREEN */
+#lockScreen{
+position:fixed;
+width:100%;
+height:100vh;
+background:#ffc0e6;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+transition:1s ease;
+z-index:10;
 }
 
-@keyframes float {
-    0% { transform: translateY(100vh); opacity:1; }
-    100% { transform: translateY(-10vh); opacity:0; }
+#lockScreen.hidden{
+transform:translateY(-100%);
+opacity:0;
 }
 
-.lock-container {
-    background: rgba(255,255,255,0.7);
-    padding: 40px;
-    border-radius: 25px;
-    text-align: center;
-    width: 320px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+input{
+padding:10px;
+border-radius:20px;
+border:none;
+margin-top:10px;
+text-align:center;
+width:220px;
 }
 
-h1 { 
-    color:#ff2e75; 
-    font-weight:400;
+button{
+padding:10px 20px;
+border:none;
+border-radius:20px;
+margin-top:10px;
+cursor:pointer;
+background:#ff69b4;
+color:white;
 }
 
-input, button {
-    width:100%;
-    padding:12px;
-    border-radius:15px;
-    border:none;
-    margin-top:10px;
-    font-size:16px;
+#mainContent{
+padding:30px;
+display:none;
 }
 
-button {
-    background:#ff4d88;
-    color:white;
-    cursor:pointer;
+/* Corazones */
+.heart{
+position:absolute;
+color:#ff4fa3;
+animation:float 8s linear infinite;
 }
 
-button:hover {
-    background:#ff2e75;
+@keyframes float{
+0%{transform:translateY(100vh);opacity:1;}
+100%{transform:translateY(-10vh);opacity:0;}
 }
 
-#error {
-    color:red;
-    display:none;
+/* Mensajes */
+.message{
+background:rgba(255,255,255,0.2);
+margin:10px auto;
+padding:10px;
+border-radius:20px;
+width:80%;
 }
 </style>
 </head>
 
 <body>
 
-<!-- Reproductor oculto -->
+<div id="lockScreen">
+<h2>Bienvenida a nuestro lugar ❤️</h2>
+<input type="password" id="password" placeholder="Contraseña">
+<button onclick="unlock()">Entrar</button>
+</div>
+
+<div id="mainContent">
+<h1>Nuestro Tiempo Juntos 💞</h1>
+<h2 id="contador"></h2>
+
+<hr>
+
+<h2>Mensajes Bonitos 💌</h2>
+<input type="text" id="mensajeInput" placeholder="Escribe algo lindo...">
+<button onclick="enviarMensaje()">Enviar</button>
+<div id="mensajes"></div>
+</div>
+
+<!-- YouTube oculto -->
 <div id="player" style="display:none;"></div>
+<script src="https://www.youtube.com/iframe_api"></script>
 
-<div class="lock-container" id="lockScreen">
-    <h1>Bienvenida a nuestro lugar ❤️</h1>
-    <input type="password" id="password" placeholder="Ingresa la contraseña">
-    <button onclick="checkPassword()">Entrar</button>
-    <div id="error">Contraseña incorrecta 💔</div>
-</div>
+<script type="module">
 
-<div id="content" style="display:none;text-align:center;">
-    <h1 style="color:#ff2e75;">💖 Estás dentro 💖</h1>
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-<script>
-// ====== PEGA AQUÍ TUS 5 LINKS DE YOUTUBE ======
-const playlist = [
-    "https://www.youtube.com/watch?v=xV9mqKWBqaw&list=RDxV9mqKWBqaw&start_radio=1",
-    "https://www.youtube.com/watch?v=8kL5Sb40mgg&list=RD8kL5Sb40mgg&start_radio=1",
-    "https://www.youtube.com/watch?v=R5cbxTPZNL0&list=RD8kL5Sb40mgg&index=9",
-    "https://www.youtube.com/watch?v=Mcj75l2gJcY&list=RD8kL5Sb40mgg&index=9",
-    "https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"
+/* 🔥 TU CONFIG YA INTEGRADA */
+const firebaseConfig = {
+  apiKey: "AIzaSyDZbYnONzq_fXZ696MEI8rYkNHHs0yNNy4",
+  authDomain: "nuestro-lugar.firebaseapp.com",
+  projectId: "nuestro-lugar",
+  storageBucket: "nuestro-lugar.firebasestorage.app",
+  messagingSenderId: "1001590537058",
+  appId: "1:1001590537058:web:1096b422db717d43320a3b"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* 🔐 CONTRASEÑA */
+window.unlock = function(){
+if(document.getElementById("password").value==="MarioAndYoss4EVER"){
+document.getElementById("lockScreen").classList.add("hidden");
+setTimeout(()=>{
+document.getElementById("mainContent").style.display="block";
+},1000);
+}
+}
+
+/* 💗 CORAZONES */
+setInterval(()=>{
+let heart=document.createElement("div");
+heart.className="heart";
+heart.innerHTML="💗";
+heart.style.left=Math.random()*100+"vw";
+heart.style.fontSize=(20+Math.random()*30)+"px";
+document.body.appendChild(heart);
+setTimeout(()=>heart.remove(),8000);
+},500);
+
+/* ⏳ CONTADOR */
+function actualizarContador(){
+let inicio=new Date("2026-01-23T00:00:00");
+let ahora=new Date();
+let diff=ahora-inicio;
+let dias=Math.floor(diff/(1000*60*60*24));
+document.getElementById("contador").innerText=
+dias+" días juntos 💕";
+}
+setInterval(actualizarContador,1000);
+
+/* 💌 MENSAJES */
+window.enviarMensaje=async function(){
+let texto=document.getElementById("mensajeInput").value;
+if(texto==="")return;
+await addDoc(collection(db,"mensajes"),{
+texto:texto,
+fecha:new Date()
+});
+document.getElementById("mensajeInput").value="";
+}
+
+const q = query(collection(db,"mensajes"), orderBy("fecha","asc"));
+
+onSnapshot(q,(snapshot)=>{
+let cont=document.getElementById("mensajes");
+cont.innerHTML="";
+snapshot.forEach(doc=>{
+cont.innerHTML+=`<div class="message">${doc.data().texto}</div>`;
+});
+});
+
+/* 🎵 PLAYLIST */
+let canciones=[
+"xV9mqKWBqaw",
+"8kL5Sb40mgg",
+"R5cbxTPZNL0",
+"Mcj75l2gJcY",
+"dElRVQFqj-k"
 ];
 
-// Extraer ID del video
-function getVideoID(url) {
-    const regExp = /v=([^&]+)/;
-    const match = url.match(regExp);
-    return match ? match[1] : null;
-}
-
-let current = 0;
 let player;
-
-// Cargar API YouTube
-let tag = document.createElement('script');
-tag.src = "https://www.youtube.com/iframe_api";
-document.body.appendChild(tag);
-
-function onYouTubeIframeAPIReady() {
-    player = new YT.Player('player', {
-        height: '0',
-        width: '0',
-        videoId: getVideoID(playlist[current]),
-        playerVars: { autoplay: 1 },
-        events: {
-            'onStateChange': onPlayerStateChange
-        }
-    });
+window.onYouTubeIframeAPIReady=function(){
+player=new YT.Player('player',{
+height:'0',
+width:'0',
+playerVars:{'autoplay':1,'controls':0},
+events:{
+'onReady':function(e){e.target.loadPlaylist(canciones);},
+}
+});
 }
 
-function onPlayerStateChange(event) {
-    if (event.data === YT.PlayerState.ENDED) {
-        current++;
-        if (current < playlist.length) {
-            player.loadVideoById(getVideoID(playlist[current]));
-        }
-    }
-}
-
-// Generar corazones
-for (let i = 0; i < 30; i++) {
-    let heart = document.createElement("div");
-    heart.className = "heart";
-    heart.innerHTML = "❤";
-    heart.style.left = Math.random() * 100 + "vw";
-    heart.style.fontSize = (15 + Math.random()*20) + "px";
-    heart.style.animationDuration = (5 + Math.random()*5) + "s";
-    document.body.appendChild(heart);
-}
-
-// Activar música en primer clic
-document.addEventListener("click", function() {
-    if(player && player.playVideo){
-        player.playVideo();
-    }
-}, { once:true });
-
-// Contraseña fija
-function checkPassword() {
-    var password = document.getElementById("password").value;
-    var correctPassword = "MarioAndYoss4EVER";
-
-    if (password === correctPassword) {
-        document.getElementById("lockScreen").style.display = "none";
-        document.getElementById("content").style.display = "block";
-    } else {
-        document.getElementById("error").style.display = "block";
-    }
-}
 </script>
 
 </body>
 </html>
+
 
 
