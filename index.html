@@ -4,203 +4,153 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nuestro Lugar 💗</title>
-
     <style>
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #ffd6ec;
-            overflow: hidden;
-            text-align: center;
-            color: #d81b60; /* Color más oscuro para mejor lectura */
+        body { 
+            margin: 0; 
+            font-family: 'Arial', sans-serif; 
+            background: #ffd6ec; 
+            overflow: hidden; 
+            text-align: center; 
+            color: #d81b60; 
         }
-
-        .screen {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: 1s;
+        .screen { 
+            position: absolute; 
+            width: 100%; 
+            height: 100%; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            align-items: center; 
+            transition: 1s; 
+            z-index: 10; 
         }
-
-        .hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.9);
+        .hidden { 
+            opacity: 0; 
+            pointer-events: none; 
+            transform: scale(0.9); 
         }
-
-        input {
-            padding: 12px;
-            border-radius: 20px;
-            border: 2px solid #ff69b4;
-            text-align: center;
-            outline: none;
-            font-size: 16px;
+        input { 
+            padding: 12px; 
+            border-radius: 20px; 
+            border: 2px solid #ff69b4; 
+            text-align: center; 
+            font-size: 16px; 
+            outline: none; 
+            margin-bottom: 10px;
         }
-
-        button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 20px;
-            background: #ff69b4;
-            color: white;
-            cursor: pointer;
-            margin-top: 15px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.3);
-            transition: 0.3s;
+        button { 
+            padding: 12px 25px; 
+            border: none; 
+            border-radius: 20px; 
+            background: #ff69b4; 
+            color: white; 
+            cursor: pointer; 
+            font-weight: bold; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
-
-        button:hover {
-            background: #ff1493;
-            transform: translateY(-2px);
+        button:hover { background: #ff1493; }
+        .heart { 
+            position: absolute; 
+            color: #ff4da6; 
+            font-size: 30px; 
+            user-select: none; 
+            animation: float 10s linear infinite; 
+            z-index: -1; 
         }
-
-        .heart {
-            position: absolute;
-            color: #ff4da6;
-            font-size: 30px;
-            user-select: none;
-            animation: float 10s linear infinite;
-            z-index: -1;
+        @keyframes float { 
+            0% { transform: translateY(110vh); opacity: 0; } 
+            50% { opacity: 1; } 
+            100% { transform: translateY(-10vh); opacity: 0; } 
         }
-
-        @keyframes float {
-            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
-            20% { opacity: 1; }
-            100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+        #contador { 
+            font-size: 22px; 
+            margin: 20px; 
+            background: rgba(255, 255, 255, 0.5); 
+            padding: 20px; 
+            border-radius: 15px; 
+            line-height: 1.5;
         }
-
-        #contador {
-            font-size: 24px;
-            margin: 20px;
-            background: rgba(255, 255, 255, 0.4);
-            padding: 20px;
-            border-radius: 15px;
-            line-height: 1.6;
-        }
-
-        #musicBtn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #ff1493;
-            z-index: 100;
-        }
-
-        #version {
-            position: fixed;
-            bottom: 10px;
-            left: 15px;
-            font-size: 12px;
-            opacity: 0.6;
-        }
-
-        h1, h2 {
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-        }
+        #version { position: fixed; bottom: 10px; left: 15px; font-size: 12px; opacity: 0.6; }
+        #player { position: absolute; top: -1000px; left: -1000px; }
     </style>
 </head>
 <body>
 
     <div id="lock" class="screen">
         <h1>Bienvenida a nuestro lugar 💗</h1>
-        <input type="password" id="password" placeholder="Nuestra contraseña">
-        <button onclick="unlock()">Desbloquear</button>
+        <input type="password" id="password" placeholder="Contraseña">
+        <button onclick="unlock()">Entrar y Escuchar 🎵</button>
     </div>
 
     <div id="main" class="screen hidden">
         <h2>Tiempo juntos 💕</h2>
-        <div id="contador">Cargando nuestro tiempo...</div>
+        <div id="contador">Cargando...</div>
     </div>
 
-    <button id="musicBtn" onclick="toggleMusic()">Activar música 🎵</button>
-
-    <div id="version">v2.1</div>
-
+    <div id="version">v3.1</div>
     <div id="player"></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        /* ========= CONFIGURACIÓN ========= */
-        const youtubeLinks = ["https://www.youtube.com/watch?v=dElRVQFqj-k&list=RDdElRVQFqj-k&start_radio=1"];
+        /* IMPORTANTE: El ID del video es lo que aparece después de "v=" en el link.
+           En este caso, para "https://www.youtube.com/watch?v=dElRVQFqj-k", el ID es "dElRVQFqj-k"
+        */
+        const VIDEO_ID = "PLVNTLp-dvMDjGQJqvR14FR1FkUNcsFKDV"; 
         const PASSWORD = "MarioAndYoss4EVER";
         const startDate = new Date("2026-01-23T00:00:00");
-        /* ================================= */
 
-        let currentSong = 0;
         let player;
-        let playerReady = false;
-        let isPlaying = false;
+        let apiReady = false;
 
-        // Cargar API de YouTube
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '0',
+                height: '0', 
                 width: '0',
-                playerVars: { 'autoplay': 0, 'controls': 0 },
-                events: {
-                    'onReady': () => { playerReady = true; },
-                    'onStateChange': onPlayerStateChange
+                videoId: VIDEO_ID,
+                playerVars: { 
+                    'autoplay': 0, 
+                    'controls': 0, 
+                    'loop': 1, 
+                    'playlist': VIDEO_ID 
+                },
+                events: { 
+                    'onReady': () => { apiReady = true; } 
                 }
             });
         }
 
-        function getVideoID(url) {
-            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-            const match = url.match(regExp);
-            return (match && match[2].length === 11) ? match[2] : null;
-        }
-
-        function toggleMusic() {
-            if (!playerReady) return;
-            
-            if (!isPlaying) {
-                player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
-                document.getElementById("musicBtn").innerText = "Pausar música ⏸️";
-                isPlaying = true;
-            } else {
-                player.pauseVideo();
-                document.getElementById("musicBtn").innerText = "Reanudar música 🎵";
-                isPlaying = false;
-            }
-        }
-
-        function onPlayerStateChange(event) {
-            if (event.data === YT.PlayerState.ENDED) {
-                currentSong = (currentSong + 1) % youtubeLinks.length;
-                player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
-            }
-        }
-
         function unlock() {
-            const passInput = document.getElementById("password").value;
-            if (passInput === PASSWORD) {
+            const input = document.getElementById("password").value;
+            if (input === PASSWORD) {
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
+
+                // Iniciamos la música al hacer clic (permitido por navegadores)
+                if (apiReady) {
+                    player.playVideo();
+                } else {
+                    console.log("La API aún no está lista, reintentando...");
+                    setTimeout(() => player.playVideo(), 1000);
+                }
             } else {
                 alert("Contraseña incorrecta 💔");
             }
         }
 
-        // Lógica de Corazones
-        function createHeart() {
+        // Lógica de los corazones flotantes
+        setInterval(() => {
             let heart = document.createElement("div");
-            heart.className = "heart";
+            heart.className = "heart"; 
             heart.innerHTML = "💗";
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.fontSize = (20 + Math.random() * 40) + "px";
-            heart.style.animationDuration = (5 + Math.random() * 7) + "s";
+            heart.style.fontSize = (20 + Math.random() * 30) + "px";
+            heart.style.animationDuration = (5 + Math.random() * 5) + "s";
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 10000);
-        }
-        setInterval(createHeart, 500);
+        }, 500);
 
-        // Lógica del Contador
+        // Lógica del contador de tiempo
         function updateCounter() {
             let now = new Date();
             let diff = now - startDate;
@@ -210,22 +160,17 @@
                 return;
             }
 
-            let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            let hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-            let minutes = Math.floor((diff / (1000 * 60)) % 60);
-            let seconds = Math.floor((diff / 1000) % 60);
+            let d = Math.floor(diff / (1000 * 60 * 60 * 24));
+            let h = Math.floor((diff / (1000 * 60 * 60)) % 24);
+            let m = Math.floor((diff / (1000 * 60)) % 60);
+            let s = Math.floor((diff / 1000) % 60);
 
             document.getElementById("contador").innerHTML = 
-                `<strong>${days}</strong> días<br>` +
-                `${hours} horas, ${minutes} minutos<br>y ${seconds} segundos juntos 💗`;
+                `<strong>${d}</strong> días<br>${h} horas, ${m} min y ${s} seg juntos 💗`;
         }
         setInterval(updateCounter, 1000);
     </script>
 </body>
 </html>
-
-
-
-
 
 
