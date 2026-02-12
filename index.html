@@ -36,7 +36,7 @@
             text-align: center; 
             font-size: 16px; 
             outline: none; 
-            margin-bottom: 10px;
+            margin-bottom: 10px; 
         }
         button { 
             padding: 12px 25px; 
@@ -46,9 +46,10 @@
             color: white; 
             cursor: pointer; 
             font-weight: bold; 
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            transition: 0.3s;
         }
-        button:hover { background: #ff1493; }
+        button:active { transform: scale(0.95); }
         .heart { 
             position: absolute; 
             color: #ff4da6; 
@@ -68,10 +69,10 @@
             background: rgba(255, 255, 255, 0.5); 
             padding: 20px; 
             border-radius: 15px; 
-            line-height: 1.5;
+            line-height: 1.5; 
         }
-        #version { position: fixed; bottom: 10px; left: 15px; font-size: 12px; opacity: 0.6; }
-        #player { position: absolute; top: -1000px; left: -1000px; }
+        /* El reproductor debe existir pero estar oculto */
+        #player { position: absolute; top: -1000px; }
     </style>
 </head>
 <body>
@@ -79,66 +80,87 @@
     <div id="lock" class="screen">
         <h1>Bienvenida a nuestro lugar 💗</h1>
         <input type="password" id="password" placeholder="Contraseña">
-        <button onclick="unlock()">Entrar y Escuchar 🎵</button>
+        <button onclick="unlock()">Entrar y Escuchar nuestra Playlist 🎵</button>
     </div>
 
     <div id="main" class="screen hidden">
         <h2>Tiempo juntos 💕</h2>
-        <div id="contador">Cargando...</div>
+        <div id="contador">Cargando nuestro tiempo...</div>
     </div>
 
-    <div id="version">v3.1</div>
     <div id="player"></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
     <script>
-        /* IMPORTANTE: El ID del video es lo que aparece después de "v=" en el link.
-           En este caso, para "https://www.youtube.com/watch?v=dElRVQFqj-k", el ID es "dElRVQFqj-k"
-        */
-        const VIDEO_ID = "PLVNTLp-dvMDjGQJqvR14FR1FkUNcsFKDV"; 
+        /* ========= CONFIGURACIÓN ========= */
+        const PLAYLIST_ID = "PLVNTLp-dvMDjGQJqvR14FR1FkUNcsFKDV"; 
         const PASSWORD = "MarioAndYoss4EVER";
         const startDate = new Date("2026-01-23T00:00:00");
+        /* ================================= */
 
         let player;
         let apiReady = false;
 
+        // Esta función la llama automáticamente la API de YouTube
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '0', 
+                height: '0',
                 width: '0',
-                videoId: VIDEO_ID,
-                playerVars: { 
-                    'autoplay': 0, 
-                    'controls': 0, 
-                    'loop': 1, 
-                    'playlist': VIDEO_ID 
+                playerVars: {
+                    'listType': 'playlist',
+                    'list': PLAYLIST_ID,
+                    'autoplay': 0,
+                    'controls': 0,
+                    'disablekb': 1,
+                    'rel': 0
                 },
-                events: { 
-                    'onReady': () => { apiReady = true; } 
+                events: {
+                    'onReady': onPlayerReady,
+                    'onError': (e) => console.log("Error de YouTube:", e)
                 }
+            });
+        }
+
+        function onPlayerReady(event) {
+            apiReady = true;
+            // Pre-cargamos la lista pero sin sonar todavía
+            player.cuePlaylist({
+                list: PLAYLIST_ID,
+                listType: 'playlist',
+                index: 0,
+                startSeconds: 0
             });
         }
 
         function unlock() {
             const input = document.getElementById("password").value;
             if (input === PASSWORD) {
+                // Cambiar de pantalla
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
 
-                // Iniciamos la música al hacer clic (permitido por navegadores)
-                if (apiReady) {
+                // Intentar reproducir música
+                if (apiReady && player) {
                     player.playVideo();
+                    // Refuerzo por si cuePlaylist no fue suficiente
+                    setTimeout(() => {
+                        if (player.getPlayerState() !== 1) { // 1 significa 'Reproduciendo'
+                            player.loadPlaylist({
+                                list: PLAYLIST_ID,
+                                listType: 'playlist'
+                            });
+                        }
+                    }, 500);
                 } else {
-                    console.log("La API aún no está lista, reintentando...");
-                    setTimeout(() => player.playVideo(), 1000);
+                    console.log("API no lista, la música podría tardar...");
                 }
             } else {
                 alert("Contraseña incorrecta 💔");
             }
         }
 
-        // Lógica de los corazones flotantes
+        // Generador de corazones
         setInterval(() => {
             let heart = document.createElement("div");
             heart.className = "heart"; 
@@ -150,7 +172,7 @@
             setTimeout(() => heart.remove(), 10000);
         }, 500);
 
-        // Lógica del contador de tiempo
+        // Contador de tiempo
         function updateCounter() {
             let now = new Date();
             let diff = now - startDate;
@@ -166,11 +188,10 @@
             let s = Math.floor((diff / 1000) % 60);
 
             document.getElementById("contador").innerHTML = 
-                `<strong>${d}</strong> días<br>${h} horas, ${m} min y ${s} seg juntos 💗`;
+                `<strong>${d}</strong> días<br>${h}h : ${m}m : ${s}s juntos 💗`;
         }
         setInterval(updateCounter, 1000);
     </script>
 </body>
 </html>
-
 
