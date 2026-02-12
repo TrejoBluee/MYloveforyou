@@ -89,10 +89,10 @@ background:#ff1493;
 
 <button id="musicBtn" onclick="startMusic()">Activar música 🎵</button>
 
-<!-- 👇 CAMBIO: ahora es div y no iframe -->
+<!-- REPRODUCTOR -->
 <div id="player"></div>
 
-<!-- API oficial de YouTube -->
+<!-- API OFICIAL -->
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script>
@@ -100,9 +100,7 @@ background:#ff1493;
 /* ========= 🎵 PEGA TUS LINKS DE YOUTUBE AQUÍ ========= */
 
 const youtubeLinks = [
-  "https://youtu.be/dElRVQFqj-k?si=Vb2Bb17XKBHsiaOn",
-  "https://www.youtube.com/watch?v=MzNduKt0ylU&list=RDMzNduKt0ylU&start_radio=1",
-  "https://www.youtube.com/watch?v=Z1zYWPBsNjw&list=RDZ1zYWPBsNjw&start_radio=1"
+  "https://www.youtube.com/watch?v=dElRVQFqj-k"
 ];
 
 /* ================================================ */
@@ -110,8 +108,25 @@ const youtubeLinks = [
 const PASSWORD = "MarioAndYoss4EVER";
 let currentSong = 0;
 let player;
+let playerReady = false;
 
-/* ========= MÚSICA EN CADENA AUTOMÁTICA ========= */
+/* ========= API READY ========= */
+
+function onYouTubeIframeAPIReady() {
+player = new YT.Player('player', {
+height: '0',
+width: '0',
+playerVars: {
+'controls': 0
+},
+events: {
+'onReady': function() {
+playerReady = true;
+},
+'onStateChange': onPlayerStateChange
+}
+});
+}
 
 function getVideoID(url){
 let regExp = /v=([^&]+)/;
@@ -119,26 +134,18 @@ let match = url.match(regExp);
 return match ? match[1] : null;
 }
 
-function onYouTubeIframeAPIReady() {
-player = new YT.Player('player', {
-height: '0',
-width: '0',
+/* ========= BOTÓN ========= */
+
+function startMusic(){
+if(!playerReady) return;
+
+player.loadVideoById({
 videoId: getVideoID(youtubeLinks[currentSong]),
-playerVars: {
-'autoplay': 0,
-'controls': 0
-},
-events: {
-'onStateChange': onPlayerStateChange
-}
+startSeconds: 0
 });
 }
 
-function startMusic(){
-if(player){
-player.playVideo();
-}
-}
+/* ========= CAMBIO AUTOMÁTICO ========= */
 
 function onPlayerStateChange(event){
 if(event.data === YT.PlayerState.ENDED){
@@ -146,7 +153,11 @@ currentSong++;
 if(currentSong >= youtubeLinks.length){
 currentSong = 0;
 }
-player.loadVideoById(getVideoID(youtubeLinks[currentSong]));
+
+player.loadVideoById({
+videoId: getVideoID(youtubeLinks[currentSong]),
+startSeconds: 0
+});
 }
 }
 
@@ -201,6 +212,7 @@ setInterval(updateCounter,1000);
 
 </body>
 </html>
+
 
 
 
