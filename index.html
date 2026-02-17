@@ -14,6 +14,7 @@
             text-align: center; 
             color: #d81b60; 
             padding-bottom: 50px;
+            min-height: 100vh;
         }
 
         /* Pantalla de bloqueo */
@@ -25,13 +26,13 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            transition: opacity 1.5s ease, visibility 1.5s; 
-            z-index: 200; /* Siempre arriba hasta desbloquear */
+            transition: opacity 1s ease; 
+            z-index: 500; 
             background: #ffd6ec;
         }
         .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         
-        .content-box { position: relative; z-index: 210; } /* Asegura que botones estén sobre corazones */
+        .content-box { position: relative; z-index: 1000; } 
 
         input, textarea { 
             padding: 12px; border-radius: 15px; border: 2px solid #ff69b4; 
@@ -44,33 +45,42 @@
             font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         
-        /* Sistema de Corazones */
+        /* LLUVIA DE CORAZONES (DE ABAJO HACIA ARRIBA) */
         .heart { 
             position: fixed; 
+            bottom: -50px; /* Empiezan justo debajo de la pantalla */
             color: #ff4da6; 
             user-select: none; 
-            animation: float linear infinite; 
-            z-index: 100; /* Por encima del fondo rosa, debajo de la UI */
+            animation: rainUp linear infinite; 
+            z-index: 50; /* Por detrás de los textos */
             pointer-events: none;
         }
-        @keyframes float { 
-            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 
+
+        @keyframes rainUp { 
+            0% { 
+                transform: translateY(0) rotate(0deg); 
+                opacity: 0; 
+            } 
             10% { opacity: 0.8; }
             90% { opacity: 0.8; }
-            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } 
+            100% { 
+                transform: translateY(-120vh) rotate(360deg); /* Llegan hasta arriba del todo */
+                opacity: 0; 
+            } 
         }
         
         #contador { 
             font-size: 20px; margin: 15px; 
-            background: rgba(255, 255, 255, 0.7); 
+            background: rgba(255, 255, 255, 0.8); 
             padding: 15px; border-radius: 15px; display: inline-block;
+            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
         }
 
         .gallery-container { 
             position: relative; width: 85%; max-width: 400px; 
             height: 450px; margin: 10px auto; border-radius: 15px; 
             overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
-            background: #fff; z-index: 10;
+            background: #fff; z-index: 100;
         }
         .gallery-img { width: 100%; height: 100%; object-fit: cover; position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 1s; }
         .gallery-img.active { opacity: 1; }
@@ -133,7 +143,12 @@
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '0', width: '0',
-                playerVars: { 'listType': 'playlist', 'list': PLAYLIST_ID, 'autoplay': 0 },
+                playerVars: { 
+                    'listType': 'playlist', 
+                    'list': PLAYLIST_ID, 
+                    'autoplay': 0,
+                    'enablejsapi': 1 
+                },
                 events: { 'onReady': () => { apiReady = true; } }
             });
         }
@@ -146,6 +161,9 @@
                 if (apiReady && player) {
                     player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist', index: 0 });
                     player.playVideo();
+                    player.setVolume(100);
+                    // Forzar play de nuevo tras un segundo si no arranca
+                    setTimeout(() => { player.playVideo(); }, 1000);
                 }
                 initGallery();
                 renderDates();
@@ -171,18 +189,20 @@
             }, 4000);
         }
 
-        // Lluvia de corazones mejorada
+        // LLUVIA DE CORAZONES MEJORADA
         function createHeart() {
             const heart = document.createElement("div");
             heart.className = "heart";
             heart.innerHTML = ["💗", "💖", "💕", "❤", "😍"][Math.floor(Math.random() * 5)];
             heart.style.left = Math.random() * 100 + "vw";
-            heart.style.fontSize = (Math.random() * 20 + 15) + "px";
-            heart.style.animationDuration = (Math.random() * 5 + 4) + "s";
+            heart.style.fontSize = (Math.random() * 25 + 15) + "px";
+            // Velocidad aleatoria para que se vea más natural
+            heart.style.animationDuration = (Math.random() * 4 + 4) + "s"; 
             document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 9000);
+            setTimeout(() => heart.remove(), 8000);
         }
-        setInterval(createHeart, 300);
+        // Generar corazones más rápido para que la lluvia sea densa
+        setInterval(createHeart, 200);
 
         function addDate() {
             const text = document.getElementById("dateInput").value;
