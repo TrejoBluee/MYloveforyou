@@ -43,21 +43,21 @@
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } 
         }
 
-        /* WIDGETS LADO IZQUIERDO (DE EN MEDIO HACIA ARRIBA) */
+        /* WIDGETS LADO IZQUIERDO */
         .side-container {
             position: fixed;
             left: 20px;
-            top: 10%; /* Empieza arriba */
-            width: 200px; /* Más ancho */
+            top: 5%; 
+            width: 220px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
             z-index: 200;
         }
 
         .side-widget {
             padding: 20px;
-            background: rgba(255, 255, 255, 0.7);
+            background: rgba(255, 255, 255, 0.75);
             border-radius: 25px;
             box-shadow: 0 6px 20px rgba(0,0,0,0.1);
             backdrop-filter: blur(8px);
@@ -93,13 +93,21 @@
             justify-content: center; text-align: center; font-size: 13px;
         }
 
-        /* Ajuste para móviles */
-        @media (max-width: 900px) {
+        @media (max-width: 950px) {
             .side-container { position: static; width: 90%; margin: 20px auto; flex-direction: row; flex-wrap: wrap; justify-content: center; }
-            .side-widget { width: 140px; }
+            .side-widget { width: 160px; }
         }
 
-        #player { position: absolute; top: -1000px; left: -1000px; }
+        /* El reproductor ahora es un iframe visible pero muy pequeño para forzar la carga */
+        #player-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 200px;
+            height: 100px;
+            z-index: -1;
+            opacity: 0.01;
+        }
     </style>
 </head>
 <body>
@@ -119,7 +127,6 @@
             <p id="mensaje-amor" style="font-size: 15px; font-weight: bold;">Haz clic en el sobre...</p>
             <button onclick="nuevoMensaje()" style="font-size: 25px; padding: 10px;">✉️</button>
         </div>
-
         <div class="side-widget">
             <h4>Vales por... 🎟️</h4>
             <div class="coupon">Abrazo infinito 🫂</div>
@@ -133,9 +140,7 @@
         <div class="content-box">
             <h2 style="margin:0;">Tiempo juntos 💕</h2>
             <div id="contador">Cargando...</div>
-            
             <div class="gallery-container" id="gallery"></div>
-
             <div class="dates-section">
                 <h3>Ideas para Date? 💡</h3>
                 <textarea id="dateInput" placeholder="Ej: Ir por sushi..."></textarea><br>
@@ -145,7 +150,9 @@
         </div>
     </div>
 
-    <div id="player"></div>
+    <div id="player-container">
+        <div id="player"></div>
+    </div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -169,13 +176,18 @@
         ];
 
         let player;
-        let apiReady = false;
 
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
-                height: '0', width: '0',
-                playerVars: { 'listType': 'playlist', 'list': PLAYLIST_ID, 'autoplay': 0 },
-                events: { 'onReady': () => { apiReady = true; } }
+                height: '100',
+                width: '200',
+                playerVars: {
+                    'listType': 'playlist',
+                    'list': PLAYLIST_ID,
+                    'autoplay': 0,
+                    'controls': 1,
+                    'loop': 1
+                }
             });
         }
 
@@ -185,11 +197,19 @@
                 document.getElementById("main").classList.remove("hidden");
                 document.getElementById("widgets-container").classList.remove("hidden");
                 
-                if (apiReady && player) {
-                    player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist', index: 0 });
+                // Forzar inicio de música al interactuar
+                if (player && typeof player.playVideo === 'function') {
+                    player.setVolume(100);
                     player.playVideo();
-                    setTimeout(() => { player.playVideo(); }, 1000);
+                    
+                    // Doble verificación: si no arranca en 1 segundo, reintentar
+                    setTimeout(() => {
+                        if (player.getPlayerState() !== 1) {
+                            player.playVideo();
+                        }
+                    }, 1000);
                 }
+                
                 initGallery();
                 renderDates();
             } else { alert("Contraseña incorrecta 💔"); }
@@ -197,8 +217,7 @@
 
         function nuevoMensaje() {
             const p = document.getElementById("mensaje-amor");
-            const random = frases[Math.floor(Math.random() * frases.length)];
-            p.innerText = random;
+            p.innerText = frases[Math.floor(Math.random() * frases.length)];
         }
 
         function initGallery() {
