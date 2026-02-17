@@ -9,12 +9,13 @@
             margin: 0; 
             font-family: 'Arial', sans-serif; 
             background: #ffd6ec; 
-            overflow-y: auto; /* Permite bajar para ver las ideas de dates */
+            overflow-y: auto; 
             overflow-x: hidden; 
             text-align: center; 
             color: #d81b60; 
             padding-bottom: 50px;
         }
+        /* Pantalla de bloqueo */
         .screen { 
             position: fixed; 
             top: 0; left: 0;
@@ -23,57 +24,65 @@
             flex-direction: column; 
             justify-content: center; 
             align-items: center; 
-            transition: 1s; 
+            transition: 1.5s ease; 
             z-index: 100; 
             background: #ffd6ec;
         }
-        .hidden { opacity: 0; pointer-events: none; transform: scale(0.9); }
+        .hidden { opacity: 0; pointer-events: none; transform: translateY(-100%); }
         
         input, textarea { 
             padding: 12px; border-radius: 15px; border: 2px solid #ff69b4; 
             text-align: center; font-size: 16px; outline: none; margin-bottom: 10px; 
-            width: 80%; max-width: 300px;
+            width: 80%; max-width: 300px; position: relative; z-index: 101;
         }
         button { 
             padding: 12px 25px; border: none; border-radius: 20px; 
             background: #ff69b4; color: white; cursor: pointer; 
             font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); 
+            position: relative; z-index: 101;
         }
         
-        .heart { position: fixed; color: #ff4da6; font-size: 30px; user-select: none; animation: float 10s linear infinite; z-index: -1; }
-        @keyframes float { 0% { transform: translateY(110vh); opacity: 0; } 50% { opacity: 1; } 100% { transform: translateY(-10vh); opacity: 0; } }
+        /* Sistema de Corazones masivo */
+        .heart { 
+            position: fixed; 
+            color: #ff4da6; 
+            user-select: none; 
+            animation: float linear infinite; 
+            z-index: 50; /* Por debajo de botones pero visible en todo momento */
+            pointer-events: none;
+        }
+        @keyframes float { 
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; } 
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } 
+        }
         
         #contador { 
             font-size: 20px; margin: 15px; 
-            background: rgba(255, 255, 255, 0.5); 
+            background: rgba(255, 255, 255, 0.7); 
             padding: 15px; border-radius: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
 
         /* GALERÍA */
         .gallery-container { 
             position: relative; width: 85%; max-width: 400px; 
-            height: 250px; margin: 10px auto; border-radius: 15px; 
-            overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.1); 
+            height: 450px; margin: 10px auto; border-radius: 15px; 
+            overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
             background: #fff; 
         }
-        .gallery-img { width: 100%; height: 100%; object-fit: cover; position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 0.8s; }
+        .gallery-img { width: 100%; height: 100%; object-fit: cover; position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 1s; }
         .gallery-img.active { opacity: 1; }
 
-        /* POST-ITS (IDEAS PARA DATES) */
+        /* POST-ITS */
         .dates-section { margin-top: 30px; padding: 20px; }
-        .postit-container { 
-            display: flex; flex-wrap: wrap; 
-            justify-content: center; gap: 15px; margin-top: 20px; 
-        }
+        .postit-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
         .postit { 
-            background: #fff7ae; color: #444; 
-            width: 140px; min-height: 140px; padding: 15px; 
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.1); 
-            transform: rotate(-2deg); 
-            font-family: 'Comic Sans MS', cursive; 
-            display: flex; align-items: center; justify-content: center; 
-            text-align: center; position: relative;
-            font-size: 14px;
+            background: #fff7ae; color: #444; width: 140px; min-height: 140px; padding: 15px; 
+            box-shadow: 5px 5px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); 
+            font-family: 'Comic Sans MS', cursive; display: flex; align-items: center; 
+            justify-content: center; text-align: center; font-size: 14px;
         }
         .postit:nth-child(even) { transform: rotate(3deg); background: #ffcfdf; }
         
@@ -83,7 +92,7 @@
 <body>
 
     <div id="lock" class="screen">
-        <h1>Bienvenida a nuestro lugar 💗</h1>
+        <h1 style="position: relative; z-index: 101;">Bienvenida a nuestro lugar 💗</h1>
         <input type="password" id="password" placeholder="Contraseña">
         <button onclick="unlock()">Entrar y Escuchar 🎵</button>
     </div>
@@ -112,7 +121,7 @@
         const PASSWORD = "MarioAndYoss4EVER";
         const startDate = new Date("2026-01-23T00:00:00");
         const photoSources = [
-             "https://i.postimg.cc/FsFZnTJQ/Whats-App-Image-2026-02-12-at-5-25-52-PM-(2).jpg",
+            "https://i.postimg.cc/FsFZnTJQ/Whats-App-Image-2026-02-12-at-5-25-52-PM-(2).jpg",
             "https://i.postimg.cc/j2chS7mM/Whats-App-Image-2026-02-12-at-5-25-52-PM-(1).jpg",
             "https://i.postimg.cc/MTk5Pxyw/Whats-App-Image-2026-02-12-at-5-25-52-PM.jpg"
         ];
@@ -124,8 +133,19 @@
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '0', width: '0',
-                playerVars: { 'listType': 'playlist', 'list': PLAYLIST_ID, 'autoplay': 0 },
-                events: { 'onReady': () => { apiReady = true; } }
+                playerVars: { 
+                    'listType': 'playlist', 
+                    'list': PLAYLIST_ID, 
+                    'autoplay': 0,
+                    'controls': 0,
+                    'enablejsapi': 1
+                },
+                events: { 
+                    'onReady': () => { apiReady = true; },
+                    'onStateChange': (e) => {
+                        if (e.data === YT.PlayerState.CUED) e.target.playVideo();
+                    }
+                }
             });
         }
 
@@ -133,10 +153,15 @@
             if (document.getElementById("password").value === PASSWORD) {
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
+                document.getElementById("main").style.position = "relative";
                 
+                // Intento masivo de reproducir música
                 if (apiReady && player) {
-                    player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist' });
+                    player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist', index: 0 });
                     player.playVideo();
+                    player.setVolume(100);
+                    // Reintento por si acaso
+                    setTimeout(() => { if(player.getPlayerState() !== 1) player.playVideo(); }, 1500);
                 }
                 initGallery();
                 renderDates();
@@ -162,7 +187,20 @@
             }, 4000);
         }
 
-        // Lógica de Post-its
+        // Lluvia masiva de corazones (se activa desde el inicio)
+        function createHeart() {
+            const heart = document.createElement("div");
+            heart.className = "heart";
+            heart.innerHTML = ["💗", "💖", "💕", "❤", "😍"][Math.floor(Math.random() * 5)];
+            heart.style.left = Math.random() * 100 + "vw";
+            heart.style.fontSize = (Math.random() * 20 + 15) + "px";
+            heart.style.animationDuration = (Math.random() * 5 + 5) + "s";
+            heart.style.opacity = Math.random();
+            document.body.appendChild(heart);
+            setTimeout(() => heart.remove(), 10000);
+        }
+        setInterval(createHeart, 250); // Genera un corazón cada 250ms
+
         function addDate() {
             const text = document.getElementById("dateInput").value;
             if (!text) return;
@@ -185,23 +223,11 @@
             });
         }
 
-        // Corazones
-        setInterval(() => {
-            let heart = document.createElement("div");
-            heart.className = "heart"; heart.innerHTML = "💗";
-            heart.style.left = Math.random() * 100 + "vw";
-            heart.style.animationDuration = (5 + Math.random() * 5) + "s";
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 10000);
-        }, 500);
-
-        // Contador
         function updateCounter() {
-            let now = new Date();
-            let diff = now - startDate;
+            let diff = new Date() - startDate;
             let d = Math.floor(diff/(1000*60*60*24)), h = Math.floor((diff/(1000*60*60))%24),
                 m = Math.floor((diff/(1000*60))%60), s = Math.floor((diff/1000)%60);
-            document.getElementById("contador").innerHTML = `<strong>${d}</strong> días, ${h}h, ${m}m, ${s}s juntas/os 💗`;
+            document.getElementById("contador").innerHTML = `<strong>${d}</strong> días, ${h}h, ${m}m, ${s}s juntos 💗`;
         }
         setInterval(updateCounter, 1000);
     </script>
