@@ -22,11 +22,11 @@
         .content-box { position: relative; z-index: 100; max-width: 500px; margin: 0 auto; } 
 
         input, textarea { 
-            padding: 12px; border-radius: 15px; border: 2px solid #ff69b4; 
-            text-align: center; font-size: 16px; outline: none; margin-bottom: 10px; width: 80%;
+            padding: 10px; border-radius: 12px; border: 2px solid #ff69b4; 
+            text-align: center; font-size: 14px; outline: none; margin-bottom: 5px; width: 85%;
         }
         button { 
-            padding: 12px 25px; border: none; border-radius: 20px; 
+            padding: 10px 20px; border: none; border-radius: 20px; 
             background: #ff69b4; color: white; cursor: pointer; 
             font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
         }
@@ -43,34 +43,32 @@
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } 
         }
 
-        /* WIDGETS LADO IZQUIERDO */
-        .side-container {
-            position: fixed;
-            left: 20px;
-            top: 5%; 
-            width: 220px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            z-index: 200;
+        /* WIDGETS LADO IZQUIERDO (NOTAS Y VALES) */
+        .left-container {
+            position: fixed; left: 20px; top: 5%; width: 220px;
+            display: flex; flex-direction: column; gap: 15px; z-index: 200;
+        }
+
+        /* WIDGET LADO DERECHO (CALENDARIO) */
+        .right-container {
+            position: fixed; right: 20px; top: 5%; width: 240px;
+            display: flex; flex-direction: column; gap: 15px; z-index: 200;
         }
 
         .side-widget {
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.75);
-            border-radius: 25px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
-            backdrop-filter: blur(8px);
-            border: 2px solid rgba(255, 255, 255, 0.5);
+            padding: 15px; background: rgba(255, 255, 255, 0.75);
+            border-radius: 25px; box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(8px); border: 2px solid rgba(255, 255, 255, 0.5);
         }
 
-        .side-widget h4 { margin: 0 0 10px 0; font-size: 18px; }
+        .side-widget h4 { margin: 0 0 10px 0; font-size: 16px; }
 
-        .coupon {
-            background: #ff69b4; color: white; font-size: 14px;
-            padding: 8px; margin: 8px 0; border-radius: 10px;
+        .coupon, .event-item {
+            background: #ff69b4; color: white; font-size: 13px;
+            padding: 6px; margin: 5px 0; border-radius: 8px;
             border: 1px dashed white; font-weight: bold;
         }
+        .event-item { background: #d81b60; border-style: solid; text-align: left; }
 
         #contador { 
             font-size: 18px; margin: 15px; background: rgba(255, 255, 255, 0.8); 
@@ -85,29 +83,12 @@
         .gallery-img { width: 100%; height: 100%; object-fit: cover; position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 1s; }
         .gallery-img.active { opacity: 1; }
 
-        .postit-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
-        .postit { 
-            background: #fff7ae; color: #444; width: 120px; min-height: 120px; padding: 10px; 
-            box-shadow: 3px 3px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); 
-            font-family: 'Comic Sans MS', cursive; display: flex; align-items: center; 
-            justify-content: center; text-align: center; font-size: 13px;
+        @media (max-width: 1100px) {
+            .left-container, .right-container { position: static; width: 90%; margin: 10px auto; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .side-widget { width: 180px; }
         }
 
-        @media (max-width: 950px) {
-            .side-container { position: static; width: 90%; margin: 20px auto; flex-direction: row; flex-wrap: wrap; justify-content: center; }
-            .side-widget { width: 160px; }
-        }
-
-        /* El reproductor ahora es un iframe visible pero muy pequeño para forzar la carga */
-        #player-container {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            width: 200px;
-            height: 100px;
-            z-index: -1;
-            opacity: 0.01;
-        }
+        #player-container { position: fixed; bottom: 10px; right: 10px; width: 200px; height: 100px; z-index: -1; opacity: 0.01; }
     </style>
 </head>
 <body>
@@ -121,18 +102,28 @@
         </div>
     </div>
 
-    <div id="widgets-container" class="side-container hidden">
+    <div id="left-widgets" class="left-container hidden">
         <div class="side-widget">
             <h4>Notas para ti 💌</h4>
-            <p id="mensaje-amor" style="font-size: 15px; font-weight: bold;">Haz clic en el sobre...</p>
-            <button onclick="nuevoMensaje()" style="font-size: 25px; padding: 10px;">✉️</button>
+            <p id="mensaje-amor" style="font-size: 14px; font-weight: bold;">Haz clic en el sobre...</p>
+            <button onclick="nuevoMensaje()" style="font-size: 20px; padding: 5px 15px;">✉️</button>
         </div>
         <div class="side-widget">
             <h4>Vales por... 🎟️</h4>
             <div class="coupon">Abrazo infinito 🫂</div>
             <div class="coupon">Cena favorita 🍕</div>
-            <div class="coupon">Noche de pelis 🍿</div>
             <div class="coupon">Un masaje 💆‍♀️</div>
+        </div>
+    </div>
+
+    <div id="right-widgets" class="right-container hidden">
+        <div class="side-widget">
+            <h4>Próximas Dates 📅</h4>
+            <div id="eventList" style="max-height: 150px; overflow-y: auto; margin-bottom: 10px;">
+                </div>
+            <input type="text" id="eventName" placeholder="¿Qué haremos?" style="width: 80%; font-size: 12px;">
+            <input type="date" id="eventDate" style="width: 80%; font-size: 12px;">
+            <button onclick="addEvent()" style="font-size: 12px; padding: 5px 10px; margin-top: 5px;">Agregar Fecha 📌</button>
         </div>
     </div>
 
@@ -145,14 +136,12 @@
                 <h3>Ideas para Date? 💡</h3>
                 <textarea id="dateInput" placeholder="Ej: Ir por sushi..."></textarea><br>
                 <button onclick="addDate()">Pegar Idea 📌</button>
-                <div class="postit-container" id="postitContainer"></div>
+                <div id="postitContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px;"></div>
             </div>
         </div>
     </div>
 
-    <div id="player-container">
-        <div id="player"></div>
-    </div>
+    <div id="player-container"><div id="player"></div></div>
 
     <script src="https://www.youtube.com/iframe_api"></script>
 
@@ -166,66 +155,58 @@
             "https://i.postimg.cc/MTk5Pxyw/Whats-App-Image-2026-02-12-at-5-25-52-PM.jpg"
         ];
         
-        const frases = [
-            "Eres lo mejor de mi día ☀️",
-            "Amo cada segundo a tu lado 💗",
-            "Eres el amor de mi vida ✨",
-            "Gracias por hacerme tan feliz 😍",
-            "Tu sonrisa es mi lugar favorito 🌎",
-            "Eres mi persona favorita en el mundo ✨"
-        ];
+        const frases = ["Eres lo mejor de mi día ☀️", "Amo cada segundo a tu lado 💗", "Eres el amor de mi vida ✨", "Gracias por hacerme tan feliz 😍", "Tu sonrisa es mi lugar favorito 🌎"];
 
         let player;
-
         function onYouTubeIframeAPIReady() {
-            player = new YT.Player('player', {
-                height: '100',
-                width: '200',
-                playerVars: {
-                    'listType': 'playlist',
-                    'list': PLAYLIST_ID,
-                    'autoplay': 0,
-                    'controls': 1,
-                    'loop': 1
-                }
-            });
+            player = new YT.Player('player', { height: '100', width: '200', playerVars: { 'listType': 'playlist', 'list': PLAYLIST_ID, 'autoplay': 0 } });
         }
 
         function unlock() {
             if (document.getElementById("password").value === PASSWORD) {
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
-                document.getElementById("widgets-container").classList.remove("hidden");
-                
-                // Forzar inicio de música al interactuar
-                if (player && typeof player.playVideo === 'function') {
-                    player.setVolume(100);
-                    player.playVideo();
-                    
-                    // Doble verificación: si no arranca en 1 segundo, reintentar
-                    setTimeout(() => {
-                        if (player.getPlayerState() !== 1) {
-                            player.playVideo();
-                        }
-                    }, 1000);
-                }
-                
+                document.getElementById("left-widgets").classList.remove("hidden");
+                document.getElementById("right-widgets").classList.remove("hidden");
+                if (player && player.playVideo) { player.playVideo(); setTimeout(() => player.playVideo(), 1000); }
                 initGallery();
                 renderDates();
+                renderEvents();
             } else { alert("Contraseña incorrecta 💔"); }
         }
 
-        function nuevoMensaje() {
-            const p = document.getElementById("mensaje-amor");
-            p.innerText = frases[Math.floor(Math.random() * frases.length)];
+        // FUNCIONES DEL CALENDARIO
+        function addEvent() {
+            const name = document.getElementById("eventName").value;
+            const date = document.getElementById("eventDate").value;
+            if (!name || !date) return;
+            const events = JSON.parse(localStorage.getItem("calendar_events") || "[]");
+            events.push({ name, date });
+            localStorage.setItem("calendar_events", JSON.stringify(events));
+            document.getElementById("eventName").value = "";
+            renderEvents();
         }
 
+        function renderEvents() {
+            const container = document.getElementById("eventList");
+            const events = JSON.parse(localStorage.getItem("calendar_events") || "[]");
+            container.innerHTML = "";
+            events.sort((a,b) => new Date(a.date) - new Date(b.date)).forEach(ev => {
+                const div = document.createElement("div");
+                div.className = "event-item";
+                div.innerHTML = `📅 ${ev.date.split('-').reverse().join('/')}<br>${ev.name}`;
+                container.appendChild(div);
+            });
+        }
+
+        // RESTO DE FUNCIONES
+        function nuevoMensaje() { document.getElementById("mensaje-amor").innerText = frases[Math.floor(Math.random() * frases.length)]; }
+        
         function initGallery() {
             const container = document.getElementById("gallery");
             photoSources.forEach((src, i) => {
                 const img = document.createElement("img");
-                img.src = src;
-                img.className = i === 0 ? "gallery-img active" : "gallery-img";
+                img.src = src; img.className = i === 0 ? "gallery-img active" : "gallery-img";
                 container.appendChild(img);
             });
             let current = 0;
@@ -267,7 +248,7 @@
             container.innerHTML = "";
             dates.forEach(date => {
                 const div = document.createElement("div");
-                div.className = "postit";
+                div.style = "background: #fff7ae; color: #444; width: 100px; min-height: 100px; padding: 10px; box-shadow: 3px 3px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); font-family: 'Comic Sans MS', cursive; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 12px;";
                 div.innerText = date;
                 container.appendChild(div);
             });
