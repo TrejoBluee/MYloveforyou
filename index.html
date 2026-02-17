@@ -6,93 +6,86 @@
     <title>Nuestro Lugar 💗</title>
     <style>
         body { 
-            margin: 0; 
-            font-family: 'Arial', sans-serif; 
-            background: #ffd6ec; 
-            overflow-y: auto; 
-            overflow-x: hidden; 
-            text-align: center; 
-            color: #d81b60; 
-            padding-bottom: 50px;
-            min-height: 100vh;
+            margin: 0; font-family: 'Arial', sans-serif; background: #ffd6ec; 
+            overflow-y: auto; overflow-x: hidden; text-align: center; color: #d81b60; 
+            padding-bottom: 50px; min-height: 100vh;
         }
 
         /* Pantalla de bloqueo */
         .screen { 
-            position: fixed; 
-            top: 0; left: 0;
-            width: 100%; height: 100%; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            align-items: center; 
-            transition: opacity 1s ease; 
-            z-index: 500; 
-            background: #ffd6ec;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            display: flex; flex-direction: column; justify-content: center; 
+            align-items: center; transition: opacity 1s ease; z-index: 1000; background: #ffd6ec;
         }
         .hidden { opacity: 0; visibility: hidden; pointer-events: none; }
         
-        .content-box { position: relative; z-index: 1000; } 
+        .content-box { position: relative; z-index: 100; max-width: 500px; margin: 0 auto; } 
 
         input, textarea { 
             padding: 12px; border-radius: 15px; border: 2px solid #ff69b4; 
-            text-align: center; font-size: 16px; outline: none; margin-bottom: 10px; 
-            width: 80%; max-width: 300px;
+            text-align: center; font-size: 16px; outline: none; margin-bottom: 10px; width: 80%;
         }
         button { 
             padding: 12px 25px; border: none; border-radius: 20px; 
             background: #ff69b4; color: white; cursor: pointer; 
-            font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
         }
-        
-        /* LLUVIA DE CORAZONES (DE ABAJO HACIA ARRIBA) */
-        .heart { 
-            position: fixed; 
-            bottom: -50px; /* Empiezan justo debajo de la pantalla */
-            color: #ff4da6; 
-            user-select: none; 
-            animation: rainUp linear infinite; 
-            z-index: 50; /* Por detrás de los textos */
-            pointer-events: none;
-        }
+        button:hover { transform: scale(1.05); background: #ff4da6; }
 
+        /* Lluvia de Corazones */
+        .heart { 
+            position: fixed; bottom: -50px; color: #ff4da6; 
+            user-select: none; animation: rainUp linear infinite; z-index: 10; pointer-events: none;
+        }
         @keyframes rainUp { 
-            0% { 
-                transform: translateY(0) rotate(0deg); 
-                opacity: 0; 
-            } 
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; } 
             10% { opacity: 0.8; }
             90% { opacity: 0.8; }
-            100% { 
-                transform: translateY(-120vh) rotate(360deg); /* Llegan hasta arriba del todo */
-                opacity: 0; 
-            } 
+            100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } 
         }
-        
+
+        /* ELEMENTOS LATERALES */
+        .side-widget {
+            position: fixed; top: 50%; transform: translateY(-50%);
+            width: 150px; padding: 15px; background: rgba(255, 255, 255, 0.6);
+            border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            z-index: 200; backdrop-filter: blur(5px);
+        }
+        #left-widget { left: 20px; }
+        #right-widget { right: 20px; }
+
+        .coupon {
+            background: #ff69b4; color: white; font-size: 12px;
+            padding: 5px; margin: 5px 0; border-radius: 5px;
+            border: 1px dashed white;
+        }
+
         #contador { 
-            font-size: 20px; margin: 15px; 
-            background: rgba(255, 255, 255, 0.8); 
-            padding: 15px; border-radius: 15px; display: inline-block;
-            box-shadow: 0 4px 15px rgba(255, 105, 180, 0.2);
+            font-size: 18px; margin: 15px; background: rgba(255, 255, 255, 0.8); 
+            padding: 12px; border-radius: 15px; display: inline-block;
         }
 
         .gallery-container { 
-            position: relative; width: 85%; max-width: 400px; 
-            height: 450px; margin: 10px auto; border-radius: 15px; 
-            overflow: hidden; box-shadow: 0 8px 20px rgba(0,0,0,0.15); 
-            background: #fff; z-index: 100;
+            position: relative; width: 90%; max-width: 380px; 
+            height: 400px; margin: 10px auto; border-radius: 20px; 
+            overflow: hidden; box-shadow: 0 8px 25px rgba(0,0,0,0.2); background: #fff;
         }
         .gallery-img { width: 100%; height: 100%; object-fit: cover; position: absolute; left: 0; top: 0; opacity: 0; transition: opacity 1s; }
         .gallery-img.active { opacity: 1; }
 
-        .postit-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
+        .postit-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 15px; }
         .postit { 
-            background: #fff7ae; color: #444; width: 140px; min-height: 140px; padding: 15px; 
-            box-shadow: 5px 5px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); 
+            background: #fff7ae; color: #444; width: 120px; min-height: 120px; padding: 10px; 
+            box-shadow: 3px 3px 10px rgba(0,0,0,0.1); transform: rotate(-2deg); 
             font-family: 'Comic Sans MS', cursive; display: flex; align-items: center; 
-            justify-content: center; text-align: center; font-size: 14px;
+            justify-content: center; text-align: center; font-size: 13px;
         }
-        
+
+        /* Ocultar widgets en pantallas pequeñas para que no estorben */
+        @media (max-width: 800px) {
+            .side-widget { position: static; transform: none; width: 90%; margin: 10px auto; }
+        }
+
         #player { position: absolute; top: -1000px; left: -1000px; }
     </style>
 </head>
@@ -107,9 +100,23 @@
         </div>
     </div>
 
+    <div id="left-widget" class="side-widget hidden">
+        <h4 style="margin:0 0 10px 0;">Notas para ti 💌</h4>
+        <p id="mensaje-amor" style="font-size: 13px; font-style: italic;">Haz clic en el sobre...</p>
+        <button onclick="nuevoMensaje()" style="padding: 8px 15px; font-size: 20px;">✉️</button>
+    </div>
+
+    <div id="right-widget" class="side-widget hidden">
+        <h4 style="margin:0 0 10px 0;">Vales por... 🎟️</h4>
+        <div class="coupon">Un abrazo infinito</div>
+        <div class="coupon">Cena favorita</div>
+        <div class="coupon">Noche de pelis</div>
+        <div class="coupon">Un masaje</div>
+    </div>
+
     <div id="main" class="hidden" style="padding-top: 20px;">
         <div class="content-box">
-            <h2>Tiempo juntos 💕</h2>
+            <h2 style="margin:0;">Tiempo juntos 💕</h2>
             <div id="contador">Cargando...</div>
             
             <div class="gallery-container" id="gallery"></div>
@@ -136,6 +143,14 @@
             "https://i.postimg.cc/j2chS7mM/Whats-App-Image-2026-02-12-at-5-25-52-PM-(1).jpg",
             "https://i.postimg.cc/MTk5Pxyw/Whats-App-Image-2026-02-12-at-5-25-52-PM.jpg"
         ];
+        
+        const frases = [
+            "Eres lo mejor de mi día ☀️",
+            "Amo cada segundo a tu lado 💗",
+            "Gracias por existir 😍",
+            "Tu sonrisa es mi lugar favorito 🌎",
+            "Eres mi persona favorita en el mundo ✨"
+        ];
 
         let player;
         let apiReady = false;
@@ -143,12 +158,7 @@
         function onYouTubeIframeAPIReady() {
             player = new YT.Player('player', {
                 height: '0', width: '0',
-                playerVars: { 
-                    'listType': 'playlist', 
-                    'list': PLAYLIST_ID, 
-                    'autoplay': 0,
-                    'enablejsapi': 1 
-                },
+                playerVars: { 'listType': 'playlist', 'list': PLAYLIST_ID, 'autoplay': 0 },
                 events: { 'onReady': () => { apiReady = true; } }
             });
         }
@@ -157,17 +167,23 @@
             if (document.getElementById("password").value === PASSWORD) {
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
+                document.getElementById("left-widget").classList.remove("hidden");
+                document.getElementById("right-widget").classList.remove("hidden");
                 
                 if (apiReady && player) {
                     player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist', index: 0 });
                     player.playVideo();
-                    player.setVolume(100);
-                    // Forzar play de nuevo tras un segundo si no arranca
                     setTimeout(() => { player.playVideo(); }, 1000);
                 }
                 initGallery();
                 renderDates();
             } else { alert("Contraseña incorrecta 💔"); }
+        }
+
+        function nuevoMensaje() {
+            const p = document.getElementById("mensaje-amor");
+            const random = frases[Math.floor(Math.random() * frases.length)];
+            p.innerText = random;
         }
 
         function initGallery() {
@@ -189,20 +205,17 @@
             }, 4000);
         }
 
-        // LLUVIA DE CORAZONES MEJORADA
         function createHeart() {
             const heart = document.createElement("div");
             heart.className = "heart";
             heart.innerHTML = ["💗", "💖", "💕", "❤", "😍"][Math.floor(Math.random() * 5)];
             heart.style.left = Math.random() * 100 + "vw";
             heart.style.fontSize = (Math.random() * 25 + 15) + "px";
-            // Velocidad aleatoria para que se vea más natural
             heart.style.animationDuration = (Math.random() * 4 + 4) + "s"; 
             document.body.appendChild(heart);
             setTimeout(() => heart.remove(), 8000);
         }
-        // Generar corazones más rápido para que la lluvia sea densa
-        setInterval(createHeart, 200);
+        setInterval(createHeart, 250);
 
         function addDate() {
             const text = document.getElementById("dateInput").value;
