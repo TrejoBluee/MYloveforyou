@@ -30,7 +30,6 @@
             background: #ff69b4; color: white; cursor: pointer; 
             font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: 0.3s;
         }
-        button:hover { transform: scale(1.05); background: #ff4da6; }
 
         /* Lluvia de Corazones */
         .heart { 
@@ -44,20 +43,33 @@
             100% { transform: translateY(-120vh) rotate(360deg); opacity: 0; } 
         }
 
-        /* ELEMENTOS LATERALES */
-        .side-widget {
-            position: fixed; top: 50%; transform: translateY(-50%);
-            width: 150px; padding: 15px; background: rgba(255, 255, 255, 0.6);
-            border-radius: 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            z-index: 200; backdrop-filter: blur(5px);
+        /* WIDGETS LADO IZQUIERDO (DE EN MEDIO HACIA ARRIBA) */
+        .side-container {
+            position: fixed;
+            left: 20px;
+            top: 10%; /* Empieza arriba */
+            width: 200px; /* Más ancho */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            z-index: 200;
         }
-        #left-widget { left: 20px; }
-        #right-widget { right: 20px; }
+
+        .side-widget {
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 25px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+            backdrop-filter: blur(8px);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .side-widget h4 { margin: 0 0 10px 0; font-size: 18px; }
 
         .coupon {
-            background: #ff69b4; color: white; font-size: 12px;
-            padding: 5px; margin: 5px 0; border-radius: 5px;
-            border: 1px dashed white;
+            background: #ff69b4; color: white; font-size: 14px;
+            padding: 8px; margin: 8px 0; border-radius: 10px;
+            border: 1px dashed white; font-weight: bold;
         }
 
         #contador { 
@@ -81,9 +93,10 @@
             justify-content: center; text-align: center; font-size: 13px;
         }
 
-        /* Ocultar widgets en pantallas pequeñas para que no estorben */
-        @media (max-width: 800px) {
-            .side-widget { position: static; transform: none; width: 90%; margin: 10px auto; }
+        /* Ajuste para móviles */
+        @media (max-width: 900px) {
+            .side-container { position: static; width: 90%; margin: 20px auto; flex-direction: row; flex-wrap: wrap; justify-content: center; }
+            .side-widget { width: 140px; }
         }
 
         #player { position: absolute; top: -1000px; left: -1000px; }
@@ -100,18 +113,20 @@
         </div>
     </div>
 
-    <div id="left-widget" class="side-widget hidden">
-        <h4 style="margin:0 0 10px 0;">Notas para ti 💌</h4>
-        <p id="mensaje-amor" style="font-size: 13px; font-style: italic;">Haz clic en el sobre...</p>
-        <button onclick="nuevoMensaje()" style="padding: 8px 15px; font-size: 20px;">✉️</button>
-    </div>
+    <div id="widgets-container" class="side-container hidden">
+        <div class="side-widget">
+            <h4>Notas para ti 💌</h4>
+            <p id="mensaje-amor" style="font-size: 15px; font-weight: bold;">Haz clic en el sobre...</p>
+            <button onclick="nuevoMensaje()" style="font-size: 25px; padding: 10px;">✉️</button>
+        </div>
 
-    <div id="right-widget" class="side-widget hidden">
-        <h4 style="margin:0 0 10px 0;">Vales por... 🎟️</h4>
-        <div class="coupon">Un abrazo infinito</div>
-        <div class="coupon">Cena favorita</div>
-        <div class="coupon">Noche de pelis</div>
-        <div class="coupon">Un masaje</div>
+        <div class="side-widget">
+            <h4>Vales por... 🎟️</h4>
+            <div class="coupon">Abrazo infinito 🫂</div>
+            <div class="coupon">Cena favorita 🍕</div>
+            <div class="coupon">Noche de pelis 🍿</div>
+            <div class="coupon">Un masaje 💆‍♀️</div>
+        </div>
     </div>
 
     <div id="main" class="hidden" style="padding-top: 20px;">
@@ -147,7 +162,8 @@
         const frases = [
             "Eres lo mejor de mi día ☀️",
             "Amo cada segundo a tu lado 💗",
-            "Gracias por existir 😍",
+            "Eres el amor de mi vida ✨",
+            "Gracias por hacerme tan feliz 😍",
             "Tu sonrisa es mi lugar favorito 🌎",
             "Eres mi persona favorita en el mundo ✨"
         ];
@@ -167,8 +183,7 @@
             if (document.getElementById("password").value === PASSWORD) {
                 document.getElementById("lock").classList.add("hidden");
                 document.getElementById("main").classList.remove("hidden");
-                document.getElementById("left-widget").classList.remove("hidden");
-                document.getElementById("right-widget").classList.remove("hidden");
+                document.getElementById("widgets-container").classList.remove("hidden");
                 
                 if (apiReady && player) {
                     player.loadPlaylist({ list: PLAYLIST_ID, listType: 'playlist', index: 0 });
